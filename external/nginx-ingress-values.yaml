@@ -1,0 +1,6 @@
+controller:
+  ingressClassResource:
+    default: true
+  service:
+    loadBalancerIP: 10.151.0.15
+    externalTrafficPolicy: Local

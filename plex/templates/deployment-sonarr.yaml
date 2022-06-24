@@ -1,0 +1,85 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: sonarr
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: plex
+spec:
+  selector:
+    matchLabels:
+      name: sonarr
+  template:
+    metadata:
+      labels:
+        name: sonarr
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: plex-pvc
+      containers:
+        - name: sonarr
+          ports:
+            - containerPort: 8989
+          image: docker.io/linuxserver/sonarr
+          volumeMounts:
+            - mountPath: /config
+              name: data
+              subPath: sonarr/config
+            - mountPath: /downloads
+              name: data
+              subPath: transmission/downloads/complete
+            - mountPath: /tv
+              name: data
+              subPath: plex/data/tvshows
+          env:
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+            - name: TZ
+              value: "America/New_York"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: sonarr
+  annotations:
+    metallb.universe.tf/address-pool: vlan-main
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8989
+  selector:
+    name: sonarr
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plex-sonarr-ingress-tls
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - sonarr.wg.sclem.dev
+      secretName: letsencrypt-sonarr
+  rules:
+  - host: sonarr.wg.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sonarr
+            port:
+              name: http

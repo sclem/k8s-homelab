@@ -1,0 +1,27 @@
+{{- $storageHost := .Values.storageHost }}
+{{- range $key, $val := .Values.persistence }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $key }}-pv
+  namespace: {{ $key }}
+spec:
+  capacity:
+    storage: {{ $val.size }}
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: {{ $val.path }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - {{ $storageHost }}
+{{- end }}

@@ -1,0 +1,123 @@
+---
+kind: Secret
+apiVersion: v1
+data:
+  credentials.txt: {{ .Values.vpn.credentials }}
+type: Opaque
+metadata:
+  name: vpn-auth
+  namespace: {{ .Release.Namespace }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: vpn-config
+  namespace: {{ .Release.Namespace }}
+data:
+  client.ovpn: | {{ .Values.vpn.clientConfig | nindent 4 }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: transmission
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: plex
+spec:
+  selector:
+    matchLabels:
+      name: transmission
+  template:
+    metadata:
+      labels:
+        name: transmission
+    spec:
+      volumes:
+        - name: auth
+          secret:
+            secretName: vpn-auth
+        - name: config
+          configMap:
+            name: vpn-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: plex-pvc
+      containers:
+        - name: vpn
+          securityContext:
+            privileged: true
+          image: ghcr.io/wfg/openvpn-client
+          volumeMounts:
+            - mountPath: /data/auth/
+              name: auth
+            - mountPath: /data/vpn/client.ovpn
+              name: config
+              subPath: client.ovpn
+          env:
+            - name: TZ
+              value: "America/New_York"
+        - name: transmission
+          image: docker.io/linuxserver/transmission
+          ports:
+            - containerPort: 9091
+          env:
+            - name: TRANSMISSION_WEB_HOME
+              value: /flood-for-transmission/
+            - name: TZ
+              value: "America/New_York"
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+          volumeMounts:
+            - mountPath: /config
+              name: data
+              subPath: transmission/config
+            - mountPath: /downloads
+              name: data
+              subPath: transmission/downloads
+            - mountPath: /watch
+              name: data
+              subPath: transmission/watch
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: transmission
+  annotations:
+    metallb.universe.tf/address-pool: vlan-main
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9091
+  selector:
+    name: transmission
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plex-transmission-ingress-tls
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - transmission.wg.sclem.dev
+      secretName: letsencrypt-transmission
+  rules:
+  - host: transmission.wg.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: transmission
+            port:
+              name: http

@@ -1,0 +1,7 @@
+plex:
+  # secondary service for tailscale
+  loadBalancerIP: 100.64.0.6
+
+vpn:
+  client.ovpn: ""
+  credentials.txt: ""

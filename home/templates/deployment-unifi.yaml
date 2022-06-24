@@ -1,0 +1,145 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: unifi
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: unifi
+  template:
+    metadata:
+      labels:
+        name: unifi
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: home-pvc
+      containers:
+        - name: unifi
+          ports:
+            - containerPort: 8443
+              name: ubnt-8443
+              protocol: TCP
+            - containerPort: 3478
+              name: ubnt-3478
+              protocol: UDP
+            - containerPort: 10001
+              name: ubnt-10001
+              protocol: UDP
+            - containerPort: 8080
+              name: ubnt-8080
+              protocol: TCP
+            - containerPort: 1900
+              name: ubnt-1900
+              protocol: UDP
+            - containerPort: 8843
+              name: ubnt-8843
+              protocol: TCP
+            - containerPort: 8880
+              name: ubnt-8880
+              protocol: TCP
+            - containerPort: 6789
+              name: ubnt-6789
+              protocol: TCP
+            - containerPort: 5514
+              name: ubnt-5514
+              protocol: UDP
+          image: lscr.io/linuxserver/unifi-controller@sha256:f65a65e4306c5670f35e6734680a4f574f71df99477544e1059ad840a6ebcb23
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+            - name: MEM_LIMIT
+              value: "1024M"
+            - name: MEM_STARTUP
+              value: "1024M"
+          volumeMounts:
+            - mountPath: /config
+              name: data
+              subPath: unifi/config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  ports:
+  - port: 443
+    targetPort: 8443
+    name: controller-gui-api
+    protocol: TCP
+  selector:
+    name: unifi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-tcp
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  selector:
+    name: unifi
+  ports:
+  - port: 8843
+    targetPort: 8843
+    name: https-redirect
+    protocol: TCP
+  - port: 8880
+    targetPort: 8880
+    name: http-redirect
+    protocol: TCP
+  - port: 6789
+    targetPort: 6789
+    name: throughput-measurement
+    protocol: TCP
+  - port: 8080
+    targetPort: 8080
+    name: uap-inform
+    protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-udp
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  selector:
+    name: unifi
+  ports:
+  - port: 3478
+    targetPort: 3478
+    name: stun-port
+    protocol: UDP
+  - port: 10001
+    targetPort: 10001
+    name: ap-discovery
+    protocol: UDP
+  - port: 1900
+    targetPort: 1900
+    name: ubnt-1900
+    protocol: UDP
+  - port: 5514
+    targetPort: 5514
+    name: ubnt-5514
+    protocol: UDP

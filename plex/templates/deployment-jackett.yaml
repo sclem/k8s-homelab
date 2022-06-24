@@ -1,0 +1,57 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jackett
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: plex
+spec:
+  selector:
+    matchLabels:
+      name: jackett
+  template:
+    metadata:
+      labels:
+        name: jackett
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: plex-pvc
+      containers:
+        - name: jackett
+          ports:
+            - containerPort: 9117
+          image: docker.io/linuxserver/jackett
+          volumeMounts:
+            - mountPath: /config
+              name: data
+              subPath: jackett/config
+            - mountPath: /downloads
+              name: data
+              subPath: jackett/downloads
+          env:
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+            - name: TZ
+              value: "America/New_York"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: jackett
+  annotations:
+    metallb.universe.tf/address-pool: vlan-main
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 9117
+  selector:
+    name: jackett

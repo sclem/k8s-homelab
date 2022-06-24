@@ -1,0 +1,18 @@
+configInline:
+  address-pools:
+   - name: default
+     protocol: layer2
+     auto-assign: false
+     addresses:
+     - 10.151.0.15/32
+     - 100.64.0.6/32
+     - 192.168.1.254/32
+     - 192.168.4.200/32
+   - name: vlan-mgmt
+     protocol: layer2
+     addresses:
+     - 192.168.1.32/27
+   - name: vlan-main
+     protocol: layer2
+     addresses:
+     - 10.151.0.32/27

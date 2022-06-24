@@ -1,0 +1,132 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hass
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: hass
+  template:
+    metadata:
+      labels:
+        name: hass
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: home-pvc
+      containers:
+        - name: hass
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 8123
+          image: docker.io/homeassistant/home-assistant:2022.6
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: PYWEMO_CALLBACK_ADDRESS
+              value: {{ .Values.hass.pywemoLoadBalancerIP }}:8989
+          volumeMounts:
+            - mountPath: /config
+              name: data
+              subPath: homeassistant/hass/config
+        - name: mqtt
+          ports:
+            - containerPort: 1883
+          image: docker.io/eclipse-mosquitto:1.6.8
+          env:
+            - name: TZ
+              value: "America/New_York"
+          volumeMounts:
+            - mountPath: /var/lib/mosquitto
+              name: data
+              subPath: homeassistant/mqtt/db
+            - mountPath: /mosquitto/config/mosquitto.conf
+              name: data
+              subPath: homeassistant/mqtt/config/mosquitto.conf
+            - mountPath: /mosquitto/config/passwd.conf
+              name: data
+              subPath: homeassistant/mqtt/config/passwd.conf
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: hass-wemo
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.hass.pywemoLoadBalancerIP }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: wemo-upnp
+      port: 8989
+      protocol: TCP
+      targetPort: 8989
+  selector:
+    name: hass
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: hass
+  annotations:
+    metallb.universe.tf/address-pool: vlan-mgmt
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8123
+  selector:
+    name: hass
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: mqtt
+  annotations:
+    metallb.universe.tf/address-pool: vlan-mgmt
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - name: http
+      port: 1883
+      protocol: TCP
+      targetPort: 1883
+  selector:
+    name: hass
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hass-ingress-tls
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - hass.wg.sclem.dev
+      secretName: letsencrypt-hass
+  rules:
+  - host: hass.wg.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hass
+            port:
+              name: http

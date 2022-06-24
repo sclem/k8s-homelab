@@ -1,0 +1,23 @@
+coredns:
+  namespace: kube-system
+  loadBalancerIP: 192.168.1.53
+
+certmanager:
+  namespace: cert-manager
+  email: ""
+  cloudflareAPIToken: ""
+
+nginx:
+  namespace: ingress-nginx
+  tailscaleIP: 100.64.0.6
+
+# hostname for storage
+storageHost: ""
+
+persistence:
+  plex:
+    path: /data/raid/k8s
+    size: 3Ti
+  home:
+    path: /data/raid/k8s-home
+    size: 3Ti
