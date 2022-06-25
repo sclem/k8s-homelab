@@ -1,3 +1,10 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
 {{- $storageHost := .Values.storageHost }}
 {{- range $key, $val := .Values.persistence }}
 ---
@@ -11,7 +18,7 @@ spec:
     storage: {{ $val.size }}
   volumeMode: Filesystem
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
+  storageClassName: local-storage
   accessModes:
     - ReadWriteOnce
   local:
