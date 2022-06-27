@@ -1,0 +1,5 @@
+service:
+  main:
+    type: LoadBalancer
+    annotations:
+      metallb.universe.tf/address-pool: vlan-skynet

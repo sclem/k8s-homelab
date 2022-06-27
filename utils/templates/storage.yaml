@@ -2,7 +2,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: local-storage
+  name: nfs
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 {{- $storageHost := .Values.storageHost }}
@@ -18,17 +18,12 @@ spec:
     storage: {{ $val.size }}
   volumeMode: Filesystem
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
+  storageClassName: nfs
   accessModes:
+    - ReadWriteMany
     - ReadWriteOnce
-  local:
+    - ReadOnlyMany
+  nfs:
+    server: {{ $val.server }}
     path: {{ $val.path }}
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-              - {{ $storageHost }}
 {{- end }}

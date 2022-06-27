@@ -38,12 +38,35 @@ apiVersion: v1
 metadata:
   namespace: {{ .Release.Namespace }}
   name: adguard-dns-udp
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "adguard-{{ .Values.adguard.loadBalancerIP }}"
 spec:
-  clusterIP: {{ .Values.adguard.clusterIP }}
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: {{ .Values.adguard.loadBalancerIP }}
   ports:
     - name: dns-udp
       port: 53
       protocol: UDP
+      targetPort: 53
+  selector:
+    name: adguard
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: adguard-dns-tcp
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "adguard-{{ .Values.adguard.loadBalancerIP }}"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: {{ .Values.adguard.loadBalancerIP }}
+  ports:
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
       targetPort: 53
   selector:
     name: adguard

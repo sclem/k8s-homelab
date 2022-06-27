@@ -79,7 +79,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "plex"
-    metallb.universe.tf/address-pool: vlan-main
+    metallb.universe.tf/address-pool: vlan-skynet
 spec:
   type: LoadBalancer
   ports:
@@ -113,7 +113,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "plex"
-    metallb.universe.tf/address-pool: vlan-main
+    metallb.universe.tf/address-pool: vlan-skynet
 spec:
   type: LoadBalancer
   ports:

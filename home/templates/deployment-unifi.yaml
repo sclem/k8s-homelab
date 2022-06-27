@@ -72,10 +72,10 @@ metadata:
   name: unifi
   namespace: {{ .Release.Namespace }}
   annotations:
-    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifi.loadBalancerIP }}"
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  loadBalancerIP: {{ .Values.unifi.loadBalancerIP }}
   ports:
   - port: 443
     targetPort: 8443
@@ -90,10 +90,10 @@ metadata:
   name: unifi-tcp
   namespace: {{ .Release.Namespace }}
   annotations:
-    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifi.loadBalancerIP }}"
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  loadBalancerIP: {{ .Values.unifi.loadBalancerIP }}
   selector:
     name: unifi
   ports:
@@ -120,10 +120,10 @@ metadata:
   name: unifi-udp
   namespace: {{ .Release.Namespace }}
   annotations:
-    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifiLoadBalancerIP }}"
+    metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifi.loadBalancerIP }}"
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.unifiLoadBalancerIP }}
+  loadBalancerIP: {{ .Values.unifi.loadBalancerIP }}
   selector:
     name: unifi
   ports:

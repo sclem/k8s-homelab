@@ -10,3 +10,6 @@ repos:
 		https://kubernetes.github.io/ingress-nginx
 	helm repo add coredns \
 		https://coredns.github.io/helm
+
+metallb:
+	helm upgrade -n metallb-system metallb metallb/metallb -f ./metallb-values.yaml
