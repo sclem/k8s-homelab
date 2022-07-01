@@ -5,7 +5,7 @@ metadata:
   name: plex-pvc
   namespace: {{ .Release.Namespace }}
 spec:
-  storageClassName: nfs
+  storageClassName: local-storage
   volumeName: plex-pv
   accessModes:
     - ReadWriteOnce

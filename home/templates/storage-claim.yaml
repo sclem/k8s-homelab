@@ -5,7 +5,7 @@ metadata:
   name: home-pvc
   namespace: {{ .Release.Namespace }}
 spec:
-  storageClassName: nfs
+  storageClassName: local-storage
   volumeName: home-pv
   accessModes:
     - ReadWriteOnce

@@ -2,4 +2,7 @@ controller:
   ingressClassResource:
     default: true
   service:
-    externalTrafficPolicy: Local
+    enabled: false
+  dnsPolicy: ClusterFirstWithHostNet
+  hostNetwork: true
+  kind: DaemonSet

@@ -11,12 +11,13 @@ nginx:
   namespace: ingress-nginx
   tailscaleIP: 100.64.0.6
 
+# hostname for storage
+storageHost: ""
+
 persistence:
   plex:
-    server: storage.clem.lan
     path: /data/raid/k8s/plex
     size: 3Ti
   home:
-    server: storage.clem.lan
     path: /data/raid/k8s/home
     size: 3Ti

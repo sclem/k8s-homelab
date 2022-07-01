@@ -118,9 +118,39 @@ spec:
   tls:
     - hosts:
         - hass.wg.sclem.dev
+        - hass.home.sclem.dev
       secretName: letsencrypt-hass
   rules:
   - host: hass.wg.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hass
+            port:
+              name: http
+  - host: hass.home.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hass
+            port:
+              name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hass-ingress-cloud-proxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: hass.clem.lan
     http:
       paths:
       - path: /
