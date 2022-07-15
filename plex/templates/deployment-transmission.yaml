@@ -56,6 +56,8 @@ spec:
           env:
             - name: TZ
               value: "America/New_York"
+          livenessProbe:
+            {{- toYaml .Values.vpn.livenessProbe | nindent 12 }}
         - name: transmission
           image: docker.io/linuxserver/transmission
           ports:

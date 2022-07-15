@@ -3,5 +3,6 @@ plex:
   loadBalancerIP: 100.64.0.6
 
 vpn:
+  livenessProbe: {}
   client.ovpn: ""
   credentials.txt: ""
