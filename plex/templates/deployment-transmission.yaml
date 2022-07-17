@@ -45,6 +45,9 @@ spec:
       containers:
         - name: vpn
           securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
             privileged: true
           image: ghcr.io/wfg/openvpn-client
           volumeMounts:
