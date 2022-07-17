@@ -1,3 +1,4 @@
 values-home.yaml    filter=git-crypt diff=git-crypt
 *.tfvars            filter=git-crypt diff=git-crypt
 other/*.yaml        filter=git-crypt diff=git-crypt
+.envrc              filter=git-crypt diff=git-crypt
