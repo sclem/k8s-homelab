@@ -4,5 +4,5 @@ plex:
 
 vpn:
   livenessProbe: {}
-  client.ovpn: ""
-  credentials.txt: ""
+  clientConfig: ""
+  credentials: ""

@@ -2,7 +2,7 @@
 kind: Secret
 apiVersion: v1
 data:
-  credentials.txt: {{ .Values.vpn.credentials }}
+  credentials.txt: {{ .Values.vpn.credentials | b64enc }}
 type: Opaque
 metadata:
   name: vpn-auth

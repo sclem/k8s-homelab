@@ -21,3 +21,7 @@ persistence:
   home:
     path: /data/raid/k8s/home
     size: 3Ti
+
+tunnel:
+  credentials: ""
+  ingress: []
