@@ -1,0 +1,70 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: registry
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: registry
+  template:
+    metadata:
+      labels:
+        name: registry
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: home-pvc
+      containers:
+        - name: registry
+          ports:
+            - containerPort: 5000
+          image: docker.io/registry:2
+          volumeMounts:
+            - mountPath: /var/lib/registry
+              name: data
+              subPath: registry
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: registry
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    name: registry
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-ingress-tls
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - registry.home.sclem.dev
+      secretName: letsencrypt-registry
+  rules:
+  - host: registry.home.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: registry
+            port:
+              name: http
