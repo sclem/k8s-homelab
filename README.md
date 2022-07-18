@@ -16,3 +16,18 @@ Loadbalancer services to home network.
 2. Install utils/ chart
 
 3. Install home/plex charts
+
+### terraform
+
+* uses cloudflare r2 as backend
+
+#### cloudflare
+
+* creates access group for tunnel whitelist to plex
+
+#### mullvad
+
+* creates mullvad wireguard peer
+* creates dynamic port forward
+* adds port forward port and peer as kubernetes secret for transmission in plex
+  namespace

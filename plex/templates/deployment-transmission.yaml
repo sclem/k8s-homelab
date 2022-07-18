@@ -1,21 +1,4 @@
 ---
-kind: Secret
-apiVersion: v1
-data:
-  credentials.txt: {{ .Values.vpn.credentials | b64enc }}
-type: Opaque
-metadata:
-  name: vpn-auth
-  namespace: {{ .Release.Namespace }}
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: vpn-config
-  namespace: {{ .Release.Namespace }}
-data:
-  client.ovpn: | {{ .Values.vpn.clientConfig | nindent 4 }}
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -33,15 +16,15 @@ spec:
         name: transmission
     spec:
       volumes:
-        - name: auth
-          secret:
-            secretName: vpn-auth
         - name: config
-          configMap:
-            name: vpn-config
+          secret:
+            secretName: {{ .Values.vpn.secret.name }}
         - name: data
           persistentVolumeClaim:
             claimName: plex-pvc
+        - name: modules
+          hostPath:
+            path: /lib/modules
       containers:
         - name: vpn
           securityContext:
@@ -49,13 +32,13 @@ spec:
               add:
                 - NET_ADMIN
             privileged: true
-          image: ghcr.io/wfg/openvpn-client
+          image: lscr.io/linuxserver/wireguard
           volumeMounts:
-            - mountPath: /data/auth/
-              name: auth
-            - mountPath: /data/vpn/client.ovpn
+            - mountPath: /config/wg0.conf
               name: config
-              subPath: client.ovpn
+              subPath: {{ .Values.vpn.secret.configKey }}
+            - mountPath: /lib/modules
+              name: modules
           env:
             - name: TZ
               value: "America/New_York"
@@ -66,6 +49,13 @@ spec:
           ports:
             - containerPort: 9091
           env:
+            - name: PEERPORT
+              valueFrom:
+                {{- with .Values.vpn.secret }}
+                secretKeyRef:
+                  name: {{ .name }}
+                  key: {{ .portKey }}
+                {{- end }}
             - name: TRANSMISSION_WEB_HOME
               value: /flood-for-transmission/
             - name: TZ

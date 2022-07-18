@@ -3,6 +3,8 @@ plex:
   loadBalancerIP: 100.64.0.6
 
 vpn:
+  secret:
+    name: vpn-wg-conf
+    configKey: conf
+    portKey: forward_port
   livenessProbe: {}
-  clientConfig: ""
-  credentials: ""
