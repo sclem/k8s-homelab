@@ -32,6 +32,12 @@ Loadbalancer services to home network.
 * adds port forward port and peer as kubernetes secret for transmission in plex
   namespace
 
+#### wg-k8s-nodes
+
+* creates wireguard configs for mesh between peers.
+Run `terraform apply` and then `make conf HOST=<fqdn>`. Copy to host and use
+wg-quick.
+
 #### nvidia drivers
 
 ```
