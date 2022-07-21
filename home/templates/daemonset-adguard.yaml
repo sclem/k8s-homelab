@@ -1,5 +1,5 @@
 ---
-kind: Deployment
+kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: adguard
@@ -16,9 +16,26 @@ spec:
         name: adguard
     spec:
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: home-pvc
+        - name: work
+          emptyDir: {}
+        - name: conf
+          emptyDir: {}
+        - name: conf-ro
+          configMap:
+            name: adguard-config
+      # adguard wants to write config
+      initContainers:
+        - name: config-copy
+          image: docker.io/busybox:1.29.3
+          command:
+          - sh
+          - -c
+          - "cp /conftemp/* /conf/"
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+            - name: conf-ro
+              mountPath: /conftemp
       containers:
         - name: adguard
           ports:
@@ -27,11 +44,9 @@ spec:
           image: docker.io/adguard/adguardhome
           volumeMounts:
             - mountPath: /opt/adguardhome/work
-              name: data
-              subPath: adguard/work
+              name: work
             - mountPath: /opt/adguardhome/conf
-              name: data
-              subPath: adguard/conf
+              name: conf
 ---
 kind: Service
 apiVersion: v1

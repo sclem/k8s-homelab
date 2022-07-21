@@ -1,15 +1,11 @@
 coredns:
   namespace: kube-system
-  loadBalancerIP: 192.168.1.53
+  loadBalancerIP: 192.168.1.54
 
 certmanager:
   namespace: cert-manager
   email: ""
   cloudflareAPIToken: ""
-
-nginx:
-  namespace: ingress-nginx
-  tailscaleIP: 100.64.0.6
 
 persistence:
   plex:
