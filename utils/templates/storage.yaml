@@ -5,7 +5,6 @@ metadata:
   name: local-storage
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
-{{- $storageHost := .Values.storageHost }}
 {{- range $key, $val := .Values.persistence }}
 ---
 apiVersion: v1
@@ -30,5 +29,5 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-              - {{ $storageHost }}
+              - {{ $val.host }}
 {{- end }}

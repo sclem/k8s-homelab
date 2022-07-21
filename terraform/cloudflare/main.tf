@@ -4,6 +4,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 3.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.12.1"
+    }
   }
   backend "s3" {
     bucket                      = "terraform"
@@ -15,40 +19,72 @@ terraform {
 
 provider "cloudflare" {}
 
-data "cloudflare_zone" "zone" {
-  name = var.zone
-}
+//data "cloudflare_zone" "zone" {
+//  name = var.zone
+//}
+//
+//resource "cloudflare_access_application" "plex" {
+//  zone_id                   = data.cloudflare_zone.zone.id
+//  name                      = "plex"
+//  domain                    = "plex.${data.cloudflare_zone.zone.name}"
+//  type                      = "self_hosted"
+//  session_duration          = "24h"
+//  auto_redirect_to_identity = false
+//}
+//
+//resource "cloudflare_access_group" "plex" {
+//  zone_id = data.cloudflare_zone.zone.id
+//  name    = "plex public whitelist"
+//
+//  include {
+//    ip = var.ip_whitelist
+//  }
+//}
+//
+//resource "cloudflare_access_policy" "plex" {
+//  application_id = cloudflare_access_application.plex.id
+//  zone_id        = cloudflare_access_application.plex.zone_id
+//  name           = "plex public policy"
+//  precedence     = "1"
+//  decision       = "bypass"
+//
+//  include {
+//    group = [cloudflare_access_group.plex.id]
+//  }
+//}
+//
+//output "data" {
+//  value = cloudflare_access_policy.plex
+//}
 
-resource "cloudflare_access_application" "plex" {
-  zone_id                   = data.cloudflare_zone.zone.id
-  name                      = "plex"
-  domain                    = "plex.${data.cloudflare_zone.zone.name}"
-  type                      = "self_hosted"
-  session_duration          = "24h"
-  auto_redirect_to_identity = false
-}
+data "cloudflare_api_token_permission_groups" "all" {}
 
-resource "cloudflare_access_group" "plex" {
-  zone_id = data.cloudflare_zone.zone.id
-  name    = "plex public whitelist"
+resource "cloudflare_api_token" "dns_token" {
+  name = "k8s-dns-token"
 
-  include {
-    ip = var.ip_whitelist
+  policy {
+    permission_groups = [
+      data.cloudflare_api_token_permission_groups.all.permissions["DNS Write"],
+    ]
+    resources = {
+      "com.cloudflare.api.account.zone.*" = "*"
+    }
   }
 }
 
-resource "cloudflare_access_policy" "plex" {
-  application_id = cloudflare_access_application.plex.id
-  zone_id        = cloudflare_access_application.plex.zone_id
-  name           = "plex public policy"
-  precedence     = "1"
-  decision       = "bypass"
-
-  include {
-    group = [cloudflare_access_group.plex.id]
+resource "kubernetes_namespace" "external_dns_namespace" {
+  metadata {
+    name = "external-dns"
   }
 }
 
-output "data" {
-  value = cloudflare_access_policy.plex
+resource "kubernetes_secret" "cloudflare_dns_token" {
+  metadata {
+    namespace = "external-dns"
+    name      = "cloudflare-token"
+  }
+
+  data = {
+    token = cloudflare_api_token.dns_token.value
+  }
 }

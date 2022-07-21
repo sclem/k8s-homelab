@@ -52,11 +52,11 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx-lan
   tls:
     - hosts:
         - registry.home.sclem.dev
-      secretName: letsencrypt-registry
+      secretName: letsencrypt-registry.home.sclem.dev
   rules:
   - host: registry.home.sclem.dev
     http:

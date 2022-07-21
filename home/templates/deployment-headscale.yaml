@@ -1,0 +1,91 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: headscale
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: headscale
+  template:
+    metadata:
+      labels:
+        name: headscale
+    spec:
+      hostNetwork: true
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: cloud-pvc
+        - name: config
+          configMap:
+            name: headscale-config
+      containers:
+        - name: headscale
+          ports:
+            - containerPort: 8080
+            - containerPort: 3478
+          securityContext:
+            privileged: true
+          image: docker.io/headscale/headscale:0.15.0
+          env:
+            - name: GIN_MODE
+              value: release
+          command: ["headscale"]
+          args:
+            - serve
+          volumeMounts:
+            - mountPath: /var/lib/headscale
+              name: db
+              subPath: headscale
+            - mountPath: /etc/headscale
+              name: config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: headscale
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    name: headscale
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: headscale-ingress-tls-cloud
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  ingressClassName: nginx-cloud
+  tls:
+    - hosts:
+        - headscale.clem.stream
+      secretName: letsencrypt-headscale.clem.stream
+  rules:
+  - host: headscale.clem.stream
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: headscale
+            port:
+              name: http

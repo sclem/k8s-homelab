@@ -12,3 +12,17 @@ spec:
   resources:
     requests:
       storage: 10Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cloud-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: local-storage
+  volumeName: cloud-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

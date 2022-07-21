@@ -11,16 +11,19 @@ nginx:
   namespace: ingress-nginx
   tailscaleIP: 100.64.0.6
 
-# hostname for storage
-storageHost: ""
-
 persistence:
   plex:
     path: /data/raid/k8s/plex
     size: 3Ti
+    host: videx
   home:
     path: /data/raid/k8s/home
     size: 3Ti
+    host: videx
+  cloud:
+    path: /data/k8s/cloud
+    size: 15Gi
+    host: cloud
 
 tunnel:
   credentials: ""

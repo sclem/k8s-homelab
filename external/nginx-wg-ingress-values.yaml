@@ -1,0 +1,15 @@
+controller:
+  ingressClassResource:
+    default: false
+    name: nginx-wg
+    controllerValue: k8s.io/ingress-nginx-wg
+  service:
+    enabled: true
+    annotations:
+      metallb.universe.tf/allow-shared-ip: "tailscale"
+    loadBalancerIP: 100.64.0.6
+  dnsPolicy: ClusterFirstWithHostNet
+  #hostNetwork: true
+  kind: DaemonSet
+  publishService:
+    enabled: true

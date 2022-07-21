@@ -1,8 +1,0 @@
-controller:
-  ingressClassResource:
-    default: true
-  service:
-    enabled: false
-  dnsPolicy: ClusterFirstWithHostNet
-  hostNetwork: true
-  kind: DaemonSet

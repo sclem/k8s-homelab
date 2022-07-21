@@ -2,4 +2,11 @@ service:
   main:
     type: LoadBalancer
     annotations:
-      metallb.universe.tf/address-pool: vlan-skynet
+      metallb.universe.tf/address-pool: skynet
+
+nodeSelector:
+  kubernetes.io/hostname: cloud
+tolerations:
+  - key: cloud
+    operator: Exists
+    effect: NoExecute

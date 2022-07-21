@@ -49,6 +49,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "tailscale"
+    metallb.universe.tf/address-pool: tailscale
 spec:
   type: LoadBalancer
   loadBalancerIP: {{ .Values.plex.loadBalancerIP }}
@@ -79,7 +80,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "plex"
-    metallb.universe.tf/address-pool: vlan-skynet
+    metallb.universe.tf/address-pool: skynet
 spec:
   type: LoadBalancer
   ports:
@@ -113,7 +114,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "plex"
-    metallb.universe.tf/address-pool: vlan-skynet
+    metallb.universe.tf/address-pool: skynet
 spec:
   type: LoadBalancer
   ports:
@@ -147,18 +148,74 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: plex-plex-ingress-tls
+  name: plex-ingress-tls-lan
   namespace: {{ .Release.Namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx-lan
+  tls:
+    - hosts:
+        - plex.home.sclem.dev
+      secretName: letsencrypt-plex.home.sclem.dev
+  rules:
+  - host: plex.home.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: plex
+            port:
+              name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plex-ingress-tls-wg
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  ingressClassName: nginx-wg
   tls:
     - hosts:
         - plex.wg.sclem.dev
-      secretName: letsencrypt-plex
+      secretName: letsencrypt-plex.wg.sclem.dev
   rules:
   - host: plex.wg.sclem.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: plex
+            port:
+              name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plex-ingress-tls-cloud
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+spec:
+  ingressClassName: nginx-cloud
+  tls:
+    - hosts:
+        - plex.clem.stream
+      secretName: letsencrypt-plex.clem.stream
+  rules:
+  - host: plex.clem.stream
     http:
       paths:
       - path: /
