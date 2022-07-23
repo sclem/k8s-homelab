@@ -24,3 +24,14 @@ persistence:
 tunnel:
   credentials: ""
   ingress: []
+
+metallb:
+  pools:
+    default:
+      autoAssign: true
+      addresses:
+      - 10.101.101.0/27
+  l2advertisements:
+    default:
+      ipAddressPools:
+      - default

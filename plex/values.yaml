@@ -7,7 +7,7 @@ vpn:
     name: vpn-wg-conf
     configKey: conf
     portKey: forward_port
-  livenessProbe: {}
+  livenessProbeHost: google.com
 
 podSecurityContext:
   runAsUser: 1000

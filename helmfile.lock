@@ -1,0 +1,31 @@
+version: 0.144.0
+dependencies:
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.8.1
+- name: coredns
+  repository: https://coredns.github.io/helm
+  version: 1.19.4
+- name: external-dns
+  repository: https://kubernetes-sigs.github.io/external-dns/
+  version: 1.10.1
+- name: gpu-operator
+  repository: https://helm.ngc.nvidia.com/nvidia
+  version: v1.11.0
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.2.0
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.2.0
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.2.0
+- name: librespeed
+  repository: https://k8s-at-home.com/charts/
+  version: 5.3.2
+- name: metallb
+  repository: https://metallb.github.io/metallb
+  version: 0.13.4
+digest: sha256:f916688eef0da5da427232b8292b7c279590b12abac5c2204f9c3acc45cd7bca
+generated: "2022-07-23T11:08:52.319106068-04:00"

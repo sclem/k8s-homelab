@@ -11,11 +11,9 @@ Loadbalancer services to home network.
 
 ### install
 
-1. Run through external/ folder first
+Managed with helmfile.
 
-2. Install utils/ chart
-
-3. Install home/plex charts
+`helmfile sync`
 
 ### terraform
 

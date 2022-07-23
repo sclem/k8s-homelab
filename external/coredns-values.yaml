@@ -1,3 +1,0 @@
-service:
-  # default for k3s
-  clusterIP: 10.43.0.10

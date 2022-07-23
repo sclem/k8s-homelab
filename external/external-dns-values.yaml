@@ -1,9 +1,0 @@
-provider: cloudflare
-logLevel: debug
-txtOwnerId: k8s
-env:
-  - name: CF_API_TOKEN
-    valueFrom:
-      secretKeyRef:
-        name: cloudflare-token
-        key: token
