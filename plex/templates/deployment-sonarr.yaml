@@ -15,6 +15,8 @@ spec:
       labels:
         name: sonarr
     spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -23,7 +25,7 @@ spec:
         - name: sonarr
           ports:
             - containerPort: 8989
-          image: docker.io/linuxserver/sonarr
+          image: ghcr.io/k8s-at-home/sonarr
           volumeMounts:
             - mountPath: /config
               name: data
@@ -35,10 +37,6 @@ spec:
               name: data
               subPath: plex/data/tvshows
           env:
-            - name: PUID
-              value: "0"
-            - name: PGID
-              value: "0"
             - name: TZ
               value: "America/New_York"
 ---
@@ -56,28 +54,3 @@ spec:
       targetPort: 8989
   selector:
     name: sonarr
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sonarr-ingress-tls
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-wg
-  tls:
-    - hosts:
-        - sonarr.wg.sclem.dev
-      secretName: letsencrypt-sonarr
-  rules:
-  - host: sonarr.wg.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: sonarr
-            port:
-              name: http

@@ -50,6 +50,9 @@ spec:
   - default
   - skynet
   - static
+  nodeSelectors:
+  - matchLabels:
+      location: home
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement

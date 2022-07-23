@@ -15,6 +15,8 @@ spec:
       labels:
         name: jackett
     spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -23,7 +25,7 @@ spec:
         - name: jackett
           ports:
             - containerPort: 9117
-          image: docker.io/linuxserver/jackett
+          image: ghcr.io/k8s-at-home/jackett
           volumeMounts:
             - mountPath: /config
               name: data
@@ -32,10 +34,6 @@ spec:
               name: data
               subPath: jackett/downloads
           env:
-            - name: PUID
-              value: "0"
-            - name: PGID
-              value: "0"
             - name: TZ
               value: "America/New_York"
 ---

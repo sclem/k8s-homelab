@@ -1,0 +1,30 @@
+{{- define "shared.ingress.tpl" }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-tls-{{ .host }}
+  namespace: {{ .namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- with .annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .class }}
+  tls:
+    - hosts:
+        - {{ .host }}
+      secretName: letsencrypt-{{ .host }}
+  rules:
+  - host: {{ .host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .service }}
+            port:
+              name: {{ .port | default "http" }}
+{{- end }}

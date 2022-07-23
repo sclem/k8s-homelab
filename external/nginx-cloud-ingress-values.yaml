@@ -4,15 +4,17 @@ controller:
     name: nginx-cloud
     controllerValue: k8s.io/ingress-nginx-cloud
   service:
-    enabled: false
+    enabled: true
+    annotations:
+      metallb.universe.tf/address-pool: cloud
+    externalTrafficPolicy: Local
   ingressClass: nginx-cloud
   nodeSelector:
     kubernetes.io/hostname: cloud
   tolerations:
-    - key: cloud
-      operator: Exists
-      effect: NoExecute
-  hostNetwork: true
+  - key: cloud
+    operator: Exists
+    effect: NoExecute
   dnsPolicy: ClusterFirstWithHostNet
   kind: DaemonSet
   publishService:

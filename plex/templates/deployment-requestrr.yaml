@@ -46,28 +46,3 @@ spec:
       targetPort: 4545
   selector:
     name: requestrr
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: requestrr-ingress-tls
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-wg
-  tls:
-    - hosts:
-        - requestrr.wg.sclem.dev
-      secretName: letsencrypt-requestrr
-  rules:
-  - host: requestrr.wg.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: requestrr
-            port:
-              name: http

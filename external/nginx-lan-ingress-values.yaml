@@ -9,7 +9,6 @@ controller:
       metallb.universe.tf/address-pool: skynet
     externalTrafficPolicy: Local
   dnsPolicy: ClusterFirstWithHostNet
-  #hostNetwork: true
   kind: DaemonSet
   publishService:
     enabled: true

@@ -8,3 +8,13 @@ vpn:
     configKey: conf
     portKey: forward_port
   livenessProbe: {}
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+ingress:
+  plex:
+    - host: plex.example.com
+      class: nginx-lan

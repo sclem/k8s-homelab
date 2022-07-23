@@ -8,8 +8,9 @@ controller:
     annotations:
       metallb.universe.tf/allow-shared-ip: "tailscale"
     loadBalancerIP: 100.64.0.6
+  nodeSelector:
+    kubernetes.io/hostname: videx
   dnsPolicy: ClusterFirstWithHostNet
-  #hostNetwork: true
   kind: DaemonSet
   publishService:
     enabled: true

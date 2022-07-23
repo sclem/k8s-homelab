@@ -7,6 +7,8 @@ metadata:
   labels:
     app: home
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       name: headscale
@@ -15,7 +17,10 @@ spec:
       labels:
         name: headscale
     spec:
+      # needed for stun
       hostNetwork: true
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       tolerations:
         - key: cloud
           operator: Exists
@@ -27,13 +32,13 @@ spec:
         - name: config
           configMap:
             name: headscale-config
+        - name: socket
+          emptyDir: {}
       containers:
         - name: headscale
           ports:
             - containerPort: 8080
             - containerPort: 3478
-          securityContext:
-            privileged: true
           image: docker.io/headscale/headscale:0.15.0
           env:
             - name: GIN_MODE
@@ -47,6 +52,8 @@ spec:
               subPath: headscale
             - mountPath: /etc/headscale
               name: config
+            - mountPath: /var/run/headscale
+              name: socket
 ---
 kind: Service
 apiVersion: v1
@@ -61,31 +68,3 @@ spec:
       targetPort: 8080
   selector:
     name: headscale
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: headscale-ingress-tls-cloud
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/proxy-buffering: "off"
-    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
-spec:
-  ingressClassName: nginx-cloud
-  tls:
-    - hosts:
-        - headscale.clem.stream
-      secretName: letsencrypt-headscale.clem.stream
-  rules:
-  - host: headscale.clem.stream
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: headscale
-            port:
-              name: http

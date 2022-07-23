@@ -20,6 +20,7 @@ metallb:
 		metallb \
 		-n metallb-system \
 		metallb/metallb \
+		-f metallb-values.yaml
 
 
 nginx-cloud:

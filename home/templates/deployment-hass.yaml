@@ -15,14 +15,14 @@ spec:
       labels:
         name: hass
     spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: home-pvc
       containers:
         - name: hass
-          securityContext:
-            privileged: true
           ports:
             - containerPort: 8123
           image: docker.io/homeassistant/home-assistant:2022.6
@@ -101,78 +101,3 @@ spec:
       targetPort: 1883
   selector:
     name: hass
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: hass-ingress-tls-lan
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-lan
-  tls:
-    - hosts:
-        - hass.home.sclem.dev
-      secretName: letsencrypt-hass.home.sclem.dev
-  rules:
-  - host: hass.home.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: hass
-            port:
-              name: http
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: hass-ingress-tls-wg
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-wg
-  tls:
-    - hosts:
-        - hass.wg.sclem.dev
-      secretName: letsencrypt-hass.wg.sclem.dev
-  rules:
-  - host: hass.wg.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: hass
-            port:
-              name: http
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: hass-ingress-tls-cloud
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-cloud
-  tls:
-    - hosts:
-        - hass.clem.stream
-      secretName: letsencrypt-hass.clem.stream
-  rules:
-  - host: hass.clem.stream
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: hass
-            port:
-              name: http

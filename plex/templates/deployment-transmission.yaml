@@ -16,40 +16,50 @@ spec:
         name: transmission
     spec:
       volumes:
-        - name: config
+        - name: wg-conf
           secret:
             secretName: {{ .Values.vpn.secret.name }}
         - name: data
           persistentVolumeClaim:
             claimName: plex-pvc
-        - name: modules
-          hostPath:
-            path: /lib/modules
+      initContainers:
+        - name: flood-ui
+          image: curlimages/curl:7.76.1
+          command:
+          - "/bin/sh"
+          - "-c"
+          - "test ! -d /config/flood-for-transmission && curl -o- -sL https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.tar.gz | tar xzf - -C /config || exit 0"
+          volumeMounts:
+          - name: data
+            mountPath: /config
+            subPath: transmission/config
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
       containers:
         - name: vpn
           securityContext:
             capabilities:
               add:
                 - NET_ADMIN
+                - SYS_MODULE
             privileged: true
-          image: lscr.io/linuxserver/wireguard
+          image: ghcr.io/k8s-at-home/wireguard
           volumeMounts:
-            - mountPath: /config/wg0.conf
-              name: config
+            - mountPath: /etc/wireguard/wg0.conf
+              name: wg-conf
               subPath: {{ .Values.vpn.secret.configKey }}
-            - mountPath: /lib/modules
-              name: modules
-          env:
-            - name: TZ
-              value: "America/New_York"
           livenessProbe:
             {{- toYaml .Values.vpn.livenessProbe | nindent 12 }}
         - name: transmission
-          image: docker.io/linuxserver/transmission
+          image: ghcr.io/k8s-at-home/transmission
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           ports:
             - containerPort: 9091
           env:
-            - name: PEERPORT
+            - name: TRANSMISSION_SPEED_LIMIT_UP_ENABLED
+              value: "true"
+            - name: TRANSMISSION_PEER_PORT
               valueFrom:
                 {{- with .Values.vpn.secret }}
                 secretKeyRef:
@@ -57,13 +67,9 @@ spec:
                   key: {{ .portKey }}
                 {{- end }}
             - name: TRANSMISSION_WEB_HOME
-              value: /flood-for-transmission/
+              value: /config/flood-for-transmission/
             - name: TZ
               value: "America/New_York"
-            - name: PUID
-              value: "0"
-            - name: PGID
-              value: "0"
           volumeMounts:
             - mountPath: /config
               name: data
@@ -71,9 +77,6 @@ spec:
             - mountPath: /downloads
               name: data
               subPath: transmission/downloads
-            - mountPath: /watch
-              name: data
-              subPath: transmission/watch
 ---
 kind: Service
 apiVersion: v1
@@ -89,28 +92,3 @@ spec:
       targetPort: 9091
   selector:
     name: transmission
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: transmission-ingress-tls
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-wg
-  tls:
-    - hosts:
-        - transmission.wg.sclem.dev
-      secretName: letsencrypt-transmission
-  rules:
-  - host: transmission.wg.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: transmission
-            port:
-              name: http

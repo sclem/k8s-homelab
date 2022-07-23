@@ -1,2 +1,5 @@
 all:
-	helm upgrade plex . --namespace=plex --create-namespace -f ./values-home.yaml
+	helm upgrade --install plex . \
+		--namespace=plex \
+		--create-namespace \
+		-f ./values-home.yaml

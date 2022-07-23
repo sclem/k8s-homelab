@@ -15,6 +15,8 @@ spec:
       labels:
         name: radarr
     spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -23,7 +25,7 @@ spec:
         - name: radarr
           ports:
             - containerPort: 7878
-          image: docker.io/linuxserver/radarr
+          image: ghcr.io/k8s-at-home/radarr
           volumeMounts:
             - mountPath: /config
               name: data
@@ -35,10 +37,6 @@ spec:
               name: data
               subPath: plex/data/movies
           env:
-            - name: PUID
-              value: "0"
-            - name: PGID
-              value: "0"
             - name: TZ
               value: "America/New_York"
 ---
@@ -56,28 +54,3 @@ spec:
       targetPort: 7878
   selector:
     name: radarr
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: radarr-ingress-tls
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-spec:
-  ingressClassName: nginx-wg
-  tls:
-    - hosts:
-        - radarr.wg.sclem.dev
-      secretName: letsencrypt-radarr
-  rules:
-  - host: radarr.wg.sclem.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: radarr
-            port:
-              name: http
