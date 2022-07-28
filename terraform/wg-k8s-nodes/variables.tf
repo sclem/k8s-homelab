@@ -16,6 +16,11 @@ variable "wg_cidr" {
   default = "192.168.100.0/24"
 }
 
+variable "wg_cidr_v6" {
+  type    = string
+  default = "fd25:c0de::0/120"
+}
+
 variable "pod_cidr" {
   type    = string
   default = "10.42.0.0/16"

@@ -57,7 +57,19 @@ label old gpu system that doesn't work with new cuda:
 kubectl label nodes heavybrick nvidia.com/gpu.deploy.operands=false
 ```
 
+#### metallb default pool
+
+```
+kubectl label node heavybrick location=home
+```
+
 #### cloud node
+
+prevent scheduling:
+
+```
+kubectl taint node cloud cloud=<provider>:NoExecute
+```
 
 configure wireguard externally, set --flannel-iface=k8s and
 flannel-backend=host-gw. Add pod routes for 10.42.0.0/24 etc for each node

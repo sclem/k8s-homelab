@@ -20,9 +20,13 @@ resource "wireguard_asymmetric_key" "wg" {
 locals {
   peer_list = {
     for i, p in var.peers : p.fqdn => merge(p, {
-      wg_ips      = ["${cidrhost(var.wg_cidr, i + 1)}/32"]
+      wg_ips      = [
+        "${cidrhost(var.wg_cidr, i + 1)}/32",
+        "${cidrhost(var.wg_cidr_v6, i + 1)}/128",
+      ]
       key         = wireguard_asymmetric_key.wg[p.fqdn]
-      allowed_ips = [cidrsubnet(var.pod_cidr, 8, i)]
+      allowed_ips = []
+      //allowed_ips = [cidrsubnet(var.pod_cidr, 8, i)]
     })
   }
 

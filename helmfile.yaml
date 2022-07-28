@@ -16,6 +16,9 @@ repositories:
 
 releases:
 - name: coredns
+  labels:
+    app: coredns
+    system: base
   namespace: kube-system
   chart: coredns/coredns
   version: 1.19.4
@@ -52,7 +55,7 @@ releases:
       - name: prometheus
         parameters: 0.0.0.0:9153
       - name: forward
-        parameters: . /etc/resolv.conf
+        parameters: . 1.1.1.1
       - name: cache
         parameters: 30
       - name: loop
@@ -60,6 +63,9 @@ releases:
       - name: loadbalance
 
 - name: metallb
+  labels:
+    app: metallb
+    system: base
   namespace: metallb-system
   createNamespace: true
   chart: metallb/metallb
@@ -72,6 +78,9 @@ releases:
         effect: NoExecute
 
 - name: ingress-nginx-cloud
+  labels:
+    app: ingress-nginx-cloud
+    system: access
   namespace: ingress-nginx-cloud
   createNamespace: true
   chart: ingress-nginx/ingress-nginx
@@ -86,6 +95,7 @@ releases:
         enabled: true
         annotations:
           metallb.universe.tf/address-pool: cloud
+          metallb.universe.tf/allow-shared-ip: cloud
         externalTrafficPolicy: Local
       ingressClass: nginx-cloud
       nodeSelector:
@@ -100,6 +110,9 @@ releases:
         enabled: true
 
 - name: ingress-nginx-lan
+  labels:
+    app: ingress-nginx-lan
+    system: access
   namespace: ingress-nginx-lan
   createNamespace: true
   chart: ingress-nginx/ingress-nginx
@@ -121,6 +134,9 @@ releases:
         enabled: true
 
 - name: ingress-nginx-wg
+  labels:
+    app: ingress-nginx-wg
+    system: access
   namespace: ingress-nginx-wg
   createNamespace: true
   chart: ingress-nginx/ingress-nginx
@@ -144,6 +160,9 @@ releases:
         enabled: true
 
 - name: gpu-operator
+  labels:
+    app: gpu-operator
+    system: base
   namespace: gpu-operator
   chart: nvidia/gpu-operator
   createNamespace: true
@@ -155,6 +174,9 @@ releases:
       value: false
 
 - name: librespeed
+  labels:
+    app: librespeed
+    system: apps
   namespace: home
   chart: k8s-at-home/librespeed
   createNamespace: true
@@ -174,6 +196,9 @@ releases:
         effect: NoExecute
 
 - name: external-dns
+  labels:
+    app: external-dns
+    system: access
   namespace: external-dns
   chart: external-dns/external-dns
   createNamespace: true
@@ -190,6 +215,9 @@ releases:
             key: token
 
 - name: cert-manager
+  labels:
+    app: cert-manager
+    system: base
   namespace: cert-manager
   chart: jetstack/cert-manager
   createNamespace: true

@@ -51,7 +51,7 @@ derp:
 
     # If enabled, also listens in UDP at the configured address for STUN connections to help on NAT traversal
     # For more details on how this works, check this great article: https://tailscale.com/blog/how-tailscale-works/
-    stun_listen_addr: "0.0.0.0:3478"
+    stun_listen_addr: "0.0.0.0:30478"
   # List of externally available DERP maps encoded in JSON
   #urls:
   #  - https://controlplane.tailscale.com/derpmap/default
