@@ -67,7 +67,14 @@ spec:
           ports:
             - containerPort: 9091
           env:
+            {{- with .Values.transmission.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             - name: TRANSMISSION_SPEED_LIMIT_UP_ENABLED
+              value: "true"
+            - name: TRANSMISSION_IDLE_SEEDING_LIMIT_ENABLED
+              value: "true"
+            - name: TRANSMISSION_RATIO_LIMIT_ENABLED
               value: "true"
             - name: TRANSMISSION_PEER_PORT
               valueFrom:

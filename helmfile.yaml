@@ -227,18 +227,27 @@ releases:
       value: true
 
 - name: utils
+  labels:
+    app: utils
+    system: apps
   namespace: default
   chart: ./utils/
   values:
     - ./values/utils.yaml
 
 - name: home
+  labels:
+    app: home
+    system: apps
   namespace: home
   chart: ./home/
   values:
     - ./values/home.yaml
 
 - name: plex
+  labels:
+    app: plex
+    system: apps
   namespace: plex
   chart: ./plex/
   values:
