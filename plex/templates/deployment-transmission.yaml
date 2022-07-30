@@ -48,14 +48,20 @@ spec:
             - mountPath: /etc/wireguard/wg0.conf
               name: wg-conf
               subPath: {{ .Values.vpn.secret.configKey }}
+          env:
+            - name: KILLSWITCH
+              value: "true"
+            - name: KILLSWITCH_EXCLUDEDNETWORKS_IPV4
+              value: "10.42.0.0/16;10.43.0.0/16"
+            - name: KILLSWITCH_EXCLUDEDNETWORKS_IPV6
+              value: "fd10:c0de:42::/56;fd10:c0de:43::/112"
           livenessProbe:
             exec:
               command:
                 - ping
                 - -c1
-                - "-4"
                 - {{ .Values.vpn.livenessProbeHost }}
-            failureThreshold: 1
+            failureThreshold: 2
             initialDelaySeconds: 30
             periodSeconds: 300
             successThreshold: 1
