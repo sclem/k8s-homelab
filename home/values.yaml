@@ -1,8 +1,12 @@
 unifi:
+  service:
+    annotations: {}
   # wifi ap inform
   loadBalancerIP: 192.168.1.254
 
 hass:
+  service:
+    annotations: {}
   # wemo upnp needs to be in same subnet
   pywemoLoadBalancerIP: 192.168.4.200
 
@@ -13,3 +17,7 @@ podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   runAsNonRoot: true
+
+mqtt:
+  service:
+    annotations: {}

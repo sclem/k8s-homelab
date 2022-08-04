@@ -1,0 +1,63 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: pproxy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: pproxy
+  template:
+    metadata:
+      labels:
+        name: pproxy
+    spec:
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: Exists
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: pproxy
+          image: docker.io/mosajjal/pproxy:2.7.8-uv
+          stdin: true
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "true"
+          args:
+            - -vv
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: pproxy
+  annotations:
+    {{- toYaml .Values.pproxy.service.annotations | nindent 4 }}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+      # curl default port for proxy is 1080
+    - name: http-curl
+      port: 1080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    name: pproxy

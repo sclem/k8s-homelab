@@ -17,14 +17,19 @@ spec:
       labels:
         name: headscale
     spec:
-      # needed for stun
-      #hostNetwork: true
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       tolerations:
         - key: cloud
           operator: Exists
           effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: Exists
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: db
           persistentVolumeClaim:
@@ -60,9 +65,6 @@ apiVersion: v1
 metadata:
   namespace: {{ .Release.Namespace }}
   name: headscale-stun
-  #annotations:
-  #  metallb.universe.tf/address-pool: cloud
-  #  metallb.universe.tf/allow-shared-ip: cloud
 spec:
   type: NodePort
   ipFamilyPolicy: RequireDualStack

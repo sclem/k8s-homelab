@@ -1,0 +1,38 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: private-dns-updater
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    # run last
+    helm.sh/hook-weight: "-1"
+spec:
+  template:
+    metadata:
+      name: private-dns-updater
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      serviceAccountName: private-dns-updater
+      restartPolicy: Never
+      volumes:
+        - name: entrypoint
+          configMap:
+            name: private-dns-entrypoint
+            defaultMode: 0755
+      containers:
+        - name: kubectl
+          image: docker.io/bitnami/kubectl:1.24.3
+          command: ["/data/entrypoint.sh"]
+          volumeMounts:
+            - name: entrypoint
+              mountPath: /data

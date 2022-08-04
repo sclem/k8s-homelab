@@ -21,10 +21,6 @@ persistence:
     size: 15Gi
     host: cloud
 
-tunnel:
-  credentials: ""
-  ingress: []
-
 metallb:
   pools:
     default:

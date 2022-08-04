@@ -23,6 +23,13 @@ releases:
   chart: coredns/coredns
   version: 1.19.4
   values:
+  - extraVolumes:
+    - name: private-dns
+      configMap:
+        name: private-dns-hosts
+  - extraVolumeMounts:
+    - name: private-dns
+      mountPath: /etc/private-dns
   - service:
       # default for k3s
       clusterIP: 10.43.0.10
@@ -35,6 +42,7 @@ releases:
       # If serviceType is nodePort you can specify nodePort here
       # nodePort: 30053
       plugins:
+      - name: log
       - name: errors
       # Serves a /health endpoint on :8080, required for livenessProbe
       - name: health
@@ -51,6 +59,11 @@ releases:
           ttl 30
       - name: k8s_external
         parameters: k8s.lan
+        # configured with utils/private-dns-updater
+      - name: hosts
+        parameters: /etc/private-dns/hosts
+        configBlock: |-
+          fallthrough
       # Serves a /metrics endpoint on :9153, required for serviceMonitor
       - name: prometheus
         parameters: 0.0.0.0:9153
@@ -97,6 +110,10 @@ releases:
           metallb.universe.tf/address-pool: cloud
           metallb.universe.tf/allow-shared-ip: cloud
         externalTrafficPolicy: Local
+        ipFamilyPolicy: RequireDualStack
+        ipFamilies:
+          - IPv4
+          - IPv6
       ingressClass: nginx-cloud
       nodeSelector:
         kubernetes.io/hostname: cloud
@@ -207,6 +224,9 @@ releases:
   - provider: cloudflare
     logLevel: debug
     txtOwnerId: k8s
+    extraArgs:
+      # only create records for service/ingress with this annotation
+      - "--annotation-filter=sclem.dev/external-dns"
     env:
       - name: CF_API_TOKEN
         valueFrom:

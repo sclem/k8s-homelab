@@ -35,8 +35,10 @@ spec:
               name: data
               subPath: plex/transcode
           env:
+            {{- if .Values.plex.advertiseIPs }}
             - name: ADVERTISE_IP
-              value: http://plex.plex.k8s.lan,https://plex.wg.sclem.dev
+              value: {{ (join "," .Values.plex.advertiseIPs) | quote }}
+            {{- end }}
             - name: TZ
               value: "America/New_York"
 ---

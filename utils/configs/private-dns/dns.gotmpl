@@ -1,0 +1,37 @@
+{{- /*
+        For each ingress with an ip address that does not have the
+        "sclem.dev/external-dns" annotation, create a host rule.
+
+        For each service that has the "sclem.dev/private-dns" hostname
+        annotation, create a host rule.
+    */
+-}}
+{{- range $key, $val := .items -}}
+    {{- $ingStatus := (index .status.loadBalancer "ingress") -}}
+    {{- if not $ingStatus -}}
+        {{- continue -}}
+    {{- end }}
+    {{- $ip := (index  $ingStatus 0).ip }}
+        {{- if not $ip }}
+            {{- continue -}}
+        {{- end -}}
+        {{- if eq $val.kind "Ingress" -}}
+            {{- $external := (index $val.metadata.annotations "sclem.dev/external-dns") -}}
+            {{- if $external -}}
+                {{- continue -}}
+            {{- end -}}
+            {{- range $_, $val := $val.spec.rules -}}
+                {{- if $val.host -}}
+                    {{- printf "# Ingress\n" -}}
+                    {{- printf "%s\t\t%s\n" $ip $val.host -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        {{- if eq $val.kind "Service" -}}
+            {{- $url := index $val.metadata.annotations "sclem.dev/private-dns" -}}
+            {{- if $url -}}
+                {{- printf "# Service\n" -}}
+                {{- printf "%s\t\t%s\n" $ip $url -}}
+            {{- end -}}
+        {{- end -}}
+{{- end -}}

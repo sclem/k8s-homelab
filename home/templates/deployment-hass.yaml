@@ -91,6 +91,8 @@ apiVersion: v1
 metadata:
   namespace: {{ .Release.Namespace }}
   name: mqtt
+  annotations:
+    {{- toYaml .Values.mqtt.service.annotations | nindent 4 }}
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local

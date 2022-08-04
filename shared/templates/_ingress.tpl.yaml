@@ -6,6 +6,9 @@ metadata:
   name: ingress-tls-{{ .host }}
   namespace: {{ .namespace }}
   annotations:
+    {{- if .ipWhitelist }}
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ (join "," .ipWhitelist) | quote }}
+    {{- end }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- with .annotations }}
     {{- toYaml . | nindent 4 }}
