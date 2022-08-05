@@ -184,11 +184,17 @@ releases:
   chart: nvidia/gpu-operator
   createNamespace: true
   version: v1.11.0
-  set:
-    - name: driver.enabled
-      value: false
-    - name: toolkit.enabled
-      value: false
+  values:
+    - node-feature-discovery:
+        worker:
+          nodeSelector:
+            sclem.dev/enable-gpu: "true"
+    - operator:
+        defaultRuntime: containerd
+    - driver:
+        enabled: false
+    - toolkit:
+        enabled: false
 
 - name: librespeed
   labels:
@@ -245,6 +251,16 @@ releases:
   set:
     - name: installCRDs
       value: true
+
+- name: heimdall
+  labels:
+    app: heimdall
+    system: apps
+  namespace: home
+  createNamespace: true
+  chart: k8s-at-home/heimdall
+  values:
+    - ./values/heimdall.yaml
 
 - name: utils
   labels:

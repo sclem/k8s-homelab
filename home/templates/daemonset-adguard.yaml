@@ -94,9 +94,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: adguard
   annotations:
-    {{- toYaml .Values.adguard.service.annotations | nindent 4 }}
+    {{- with .Values.adguard.service.annotations -}}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
-  type: LoadBalancer
   ports:
     - name: http
       port: 80
