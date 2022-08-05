@@ -35,23 +35,6 @@ spec:
             - mountPath: /config
               name: data
               subPath: homeassistant/hass/config
-        - name: mqtt
-          ports:
-            - containerPort: 1883
-          image: docker.io/eclipse-mosquitto:1.6.8
-          env:
-            - name: TZ
-              value: "America/New_York"
-          volumeMounts:
-            - mountPath: /var/lib/mosquitto
-              name: data
-              subPath: homeassistant/mqtt/db
-            - mountPath: /mosquitto/config/mosquitto.conf
-              name: data
-              subPath: homeassistant/mqtt/config/mosquitto.conf
-            - mountPath: /mosquitto/config/passwd.conf
-              name: data
-              subPath: homeassistant/mqtt/config/passwd.conf
 ---
 kind: Service
 apiVersion: v1
@@ -83,23 +66,5 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 8123
-  selector:
-    name: hass
----
-kind: Service
-apiVersion: v1
-metadata:
-  namespace: {{ .Release.Namespace }}
-  name: mqtt
-  annotations:
-    {{- toYaml .Values.mqtt.service.annotations | nindent 4 }}
-spec:
-  type: LoadBalancer
-  externalTrafficPolicy: Local
-  ports:
-    - name: http
-      port: 1883
-      protocol: TCP
-      targetPort: 1883
   selector:
     name: hass

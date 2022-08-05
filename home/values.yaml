@@ -19,5 +19,6 @@ podSecurityContext:
   runAsNonRoot: true
 
 mqtt:
+  auth: ""
   service:
     annotations: {}

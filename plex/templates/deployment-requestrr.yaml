@@ -38,7 +38,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: requestrr
 spec:
-  type: LoadBalancer
   ports:
     - name: http
       port: 80

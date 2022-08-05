@@ -43,7 +43,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: jackett
 spec:
-  type: LoadBalancer
   ports:
     - name: http
       port: 80

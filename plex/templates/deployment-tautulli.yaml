@@ -40,7 +40,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: tautulli
 spec:
-  type: LoadBalancer
   ports:
     - name: http
       port: 80

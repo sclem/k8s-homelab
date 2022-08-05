@@ -46,7 +46,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: bazarr
 spec:
-  type: LoadBalancer
   ports:
     - name: http
       port: 80

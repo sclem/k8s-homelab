@@ -45,37 +45,6 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: plex-wg
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    metallb.universe.tf/allow-shared-ip: "tailscale"
-    metallb.universe.tf/address-pool: tailscale
-spec:
-  type: LoadBalancer
-  loadBalancerIP: {{ .Values.plex.loadBalancerIP }}
-  ports:
-    - name: http-32400
-      port: 32400
-      protocol: TCP
-      targetPort: 32400
-    - name: plex-3005
-      port: 3005
-      targetPort: 3005
-      protocol: TCP
-    - name: plex-8324
-      port: 8324
-      targetPort: 8324
-      protocol: TCP
-    - name: plex-32469
-      port: 32469
-      targetPort: 32469
-      protocol: TCP
-  selector:
-    name: plex
----
-kind: Service
-apiVersion: v1
-metadata:
   name: plex
   namespace: {{ .Release.Namespace }}
   annotations:
