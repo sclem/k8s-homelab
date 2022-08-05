@@ -73,14 +73,16 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     metallb.universe.tf/allow-shared-ip: "unifi-{{ .Values.unifi.loadBalancerIP }}"
-    {{- toYaml .Values.unifi.service.annotations | nindent 4 }}
+    {{- with .Values.unifi.service.annotations -}}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   type: LoadBalancer
   loadBalancerIP: {{ .Values.unifi.loadBalancerIP }}
   ports:
   - port: 443
     targetPort: 8443
-    name: controller-gui-api
+    name: https
     protocol: TCP
   selector:
     name: unifi

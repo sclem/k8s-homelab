@@ -1,6 +1,6 @@
 unifi:
   service:
-    annotations: {}
+    annotations: null
   # wifi ap inform
   loadBalancerIP: 192.168.1.254
 
@@ -20,5 +20,11 @@ podSecurityContext:
 
 mqtt:
   auth: ""
+  service:
+    annotations: {}
+
+docker:
+  enabled: false
+  env: []
   service:
     annotations: {}

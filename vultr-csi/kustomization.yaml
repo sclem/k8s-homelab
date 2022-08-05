@@ -1,0 +1,6 @@
+resources:
+  - https://raw.githubusercontent.com/vultr/vultr-csi/master/docs/releases/latest.yml
+  - secret-vultr-csi.yaml
+patchesStrategicMerge:
+  - daemonset-vultr-node.yaml
+  - controller-vultr.yaml

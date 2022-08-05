@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: csi-vultr-node
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: Exists

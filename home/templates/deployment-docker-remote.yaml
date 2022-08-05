@@ -1,0 +1,84 @@
+{{- if .Values.docker.enabled }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: docker
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: home
+spec:
+  selector:
+    matchLabels:
+      name: docker
+  template:
+    metadata:
+      labels:
+        name: docker
+    spec:
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: Exists
+      volumes:
+      - name: docker-data
+        persistentVolumeClaim:
+          claimName: cloud-vultr-pvc
+      containers:
+      - name: docker
+        ports:
+          - containerPort: 2376
+        securityContext:
+          privileged: true
+        image: docker.io/docker:20.10.17-dind
+        env:
+          {{- toYaml .Values.docker.env | nindent 10 }}
+        args:
+          - --mtu=1420
+        volumeMounts:
+          - name: docker-data
+            mountPath: /certs
+            subPath: docker/certs
+          - name: docker-data
+            mountPath: /var/lib/docker
+            subPath: docker/data
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: docker
+  annotations:
+    {{- toYaml .Values.docker.service.annotations | nindent 4 }}
+  labels:
+    name: docker
+spec:
+  type: LoadBalancer
+  ports:
+    - name: docker-secure
+      port: 2376
+      protocol: TCP
+      targetPort: 2376
+  selector:
+    name: docker
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloud-vultr-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 40Gi
+  storageClassName: vultr-block-storage-hdd-retain
+{{- end }}

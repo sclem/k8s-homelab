@@ -76,6 +76,14 @@ flannel-backend=host-gw. Add pod routes for 10.42.0.0/24 etc for each node
 manually. Requires manual intervention to add node to cluster, keeps from
 having extra level of indirection with vxlan or wireguard-in-wireguard.
 
+#### vultr csi
+
+Installed with kustomize
+
+```
+kubectl apply -k ./vultr-csi/
+```
+
 #### ingress
 
 Separate nginx ingress classes are created per network, "lan", "wg", and
