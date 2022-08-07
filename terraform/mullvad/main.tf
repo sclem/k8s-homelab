@@ -90,15 +90,6 @@ data "wireguard_config_document" "doc" {
   }
 }
 
-//output "wg_conf" {
-//  sensitive = true
-//  value     = data.wireguard_config_document.doc.conf
-//}
-//
-//output "port" {
-//  value = mullvad_port_forward.wireguard.port
-//}
-
 resource "kubernetes_secret" "wg_conf" {
   metadata {
     namespace = "plex"

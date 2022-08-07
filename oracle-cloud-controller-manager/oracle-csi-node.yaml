@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: csi-vultr-node
+  name: csi-oci-node
   namespace: kube-system
 spec:
   template:
@@ -18,4 +18,4 @@ spec:
               - key: cloud
                 operator: In
                 values:
-                - vultr
+                - oracle

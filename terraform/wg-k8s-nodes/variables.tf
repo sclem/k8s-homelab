@@ -11,6 +11,11 @@ variable "peers" {
   default = []
 }
 
+variable "mtu" {
+  type    = number
+  default = 1420
+}
+
 variable "wg_cidr" {
   type    = string
   default = "192.168.100.0/24"

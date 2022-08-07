@@ -26,11 +26,13 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: cloud
-                operator: Exists
+                operator: In
+                values:
+                - oracle
       volumes:
       - name: docker-data
         persistentVolumeClaim:
-          claimName: cloud-vultr-pvc
+          claimName: cloud-oracle-pvc
       containers:
       - name: docker
         ports:
@@ -41,7 +43,7 @@ spec:
         env:
           {{- toYaml .Values.docker.env | nindent 10 }}
         args:
-          - --mtu=1420
+          - --mtu=1280
         volumeMounts:
           - name: docker-data
             mountPath: /certs
@@ -68,17 +70,4 @@ spec:
       targetPort: 2376
   selector:
     name: docker
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: cloud-vultr-pvc
-  namespace: {{ .Release.Namespace }}
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 40Gi
-  storageClassName: vultr-block-storage-hdd-retain
 {{- end }}

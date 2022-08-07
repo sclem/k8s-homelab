@@ -20,7 +20,7 @@ resource "wireguard_asymmetric_key" "wg" {
 locals {
   peer_list = {
     for i, p in var.peers : p.fqdn => merge(p, {
-      wg_ips      = [
+      wg_ips = [
         "${cidrhost(var.wg_cidr, i + 1)}/32",
         "${cidrhost(var.wg_cidr_v6, i + 1)}/128",
       ]
@@ -48,11 +48,12 @@ data "wireguard_config_document" "conf" {
   private_key = each.value.key.private_key
   addresses   = each.value.wg_ips
   listen_port = var.port
+  mtu         = var.mtu
 
   dynamic "peer" {
     for_each = each.value.peers
     content {
-      endpoint             = each.value.wan ? "" : "${peer.key}:${var.port}"
+      endpoint             = (each.value.wan && !peer.value.wan) ? "" : "${peer.key}:${var.port}"
       public_key           = peer.value.key.public_key
       allowed_ips          = concat(peer.value.wg_ips, peer.value.allowed_ips)
       persistent_keepalive = 25

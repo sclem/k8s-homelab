@@ -25,7 +25,9 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: cloud
-                operator: Exists
+                operator: In
+                values:
+                - vultr
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

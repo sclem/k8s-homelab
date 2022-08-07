@@ -84,6 +84,23 @@ Installed with kustomize
 kubectl apply -k ./vultr-csi/
 ```
 
+#### oci csi
+
+k3s agent opts:
+```
+--kubelet-arg=cloud-provider=external
+--kubelet-arg=provider-id=<instance ocid>
+```
+
+required label/annotations:
+
+https://github.com/oracle/oci-cloud-controller-manager/blob/906eec8156b64c25e0d9deabe98a6a7c1e9934dd/pkg/util/commons.go#L18
+
+```
+kubectl annotate node oci-cloud-arm  oci-cloud-arm oci.oraclecloud.com/compartment-id=<ocid compartment>
+kubectl label node oci-cloud-arm failure-domain.beta.kubernetes.io/zone=US-ASHBURN-AD-1 --overwrite
+```
+
 #### ingress
 
 Separate nginx ingress classes are created per network, "lan", "wg", and

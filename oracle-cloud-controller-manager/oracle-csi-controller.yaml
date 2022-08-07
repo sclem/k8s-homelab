@@ -1,7 +1,7 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
-  name: csi-vultr-node
+  name: csi-oci-controller
   namespace: kube-system
 spec:
   template:
@@ -10,6 +10,8 @@ spec:
         - key: cloud
           operator: Exists
           effect: NoExecute
+      nodeSelector:
+        cloud: oracle
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -18,4 +20,4 @@ spec:
               - key: cloud
                 operator: In
                 values:
-                - vultr
+                - oracle

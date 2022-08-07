@@ -87,7 +87,8 @@ releases:
   - speaker:
       tolerations:
       - key: cloud
-        operator: Exists
+        operator: Equal
+        value: vultr
         effect: NoExecute
 
 - name: ingress-nginx-cloud
@@ -108,15 +109,21 @@ releases:
         enabled: true
         annotations:
           metallb.universe.tf/address-pool: cloud
-          metallb.universe.tf/allow-shared-ip: cloud
         externalTrafficPolicy: Local
         ipFamilyPolicy: RequireDualStack
         ipFamilies:
           - IPv4
           - IPv6
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: In
+                values:
+                - vultr
       ingressClass: nginx-cloud
-      nodeSelector:
-        kubernetes.io/hostname: cloud
       tolerations:
       - key: cloud
         operator: Exists
@@ -205,15 +212,19 @@ releases:
   createNamespace: true
   version: 5.3.2
   values:
+  - affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: cloud
+              operator: Exists
   - service:
       main:
         type: LoadBalancer
         annotations:
           metallb.universe.tf/address-pool: skynet
-
-    nodeSelector:
-      kubernetes.io/hostname: cloud
-    tolerations:
+  - tolerations:
       - key: cloud
         operator: Exists
         effect: NoExecute

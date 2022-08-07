@@ -16,4 +16,6 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: cloud
-                operator: Exists
+                operator: In
+                values:
+                - vultr
