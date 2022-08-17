@@ -8,11 +8,4 @@ data:
   dns.gotmpl: |-
 {{ .Files.Get "configs/private-dns/dns.gotmpl" | indent 4 }}
   entrypoint.sh: |-
-    #!/bin/bash
-    HOSTS="$(kubectl get ing,svc -A -o go-template-file=/data/dns.gotmpl)"
-    kubectl create cm \
-      -n kube-system \
-      --dry-run=client \
-      private-dns-hosts \
-      --from-literal=hosts="$HOSTS" -o yaml | \
-      kubectl apply -f -
+{{ .Files.Get "configs/private-dns/entrypoint.sh" | indent 4 }}
