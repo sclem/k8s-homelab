@@ -1,25 +1,22 @@
 {
   "hosts": {
     "videx": "100.64.0.6/32",
-    "cloud": "100.64.0.5/32"
   },
   "acls": [
     {
       "action": "accept",
-      "users": ["wg"],
-      "ports": [
+      "src": ["wg"],
+      "dst": [
         "wg:*",
         "cnet:*",
         "*:*",
-        //"0.0.0.0:*",
-        //"::/0:*",
       ]
     },
     {
       "action": "accept",
-      "users": ["cnet"],
-      "ports": [
-        "videx:80,443,32400"
+      "src": ["cnet"],
+      "dst": [
+        "videx:80,443"
       ]
     }
   ]

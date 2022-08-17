@@ -44,7 +44,7 @@ spec:
           ports:
             - containerPort: 8080
             - containerPort: 30478
-          image: docker.io/headscale/headscale:0.15.0
+          image: docker.io/headscale/headscale:0.16.2
           env:
             - name: GIN_MODE
               value: release
