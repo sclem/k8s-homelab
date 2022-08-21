@@ -16,6 +16,7 @@ spec:
         name: filebrowser
     spec:
       securityContext:
+        fsGroup: 2000
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: data

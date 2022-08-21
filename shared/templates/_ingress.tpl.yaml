@@ -23,11 +23,18 @@ spec:
   - host: {{ .host }}
     http:
       paths:
-      - path: /
+      {{- $data := . }}
+      {{- $ingress_paths := list "/" }}
+      {{- if .paths }}
+      {{- $ingress_paths = .paths }}
+      {{- end }}
+      {{- range $_, $p := $ingress_paths }}
+      - path: {{ $p }}
         pathType: Prefix
         backend:
           service:
-            name: {{ .service }}
+            name: {{ $data.service }}
             port:
-              name: {{ .port | default "http" }}
+              name: {{ $data.port | default "http" }}
+      {{- end }}
 {{- end }}
