@@ -1,41 +1,75 @@
+{{ range $key, $val := .Values.registries }}
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: registry
-  namespace: {{ .Release.Namespace }}
+  name: registry-{{ $key }}
+  namespace: {{ $.Release.Namespace }}
   labels:
     app: home
 spec:
   selector:
     matchLabels:
-      name: registry
+      name: registry-{{ $key }}
   template:
     metadata:
       labels:
-        name: registry
+        name: registry-{{ $key }}
     spec:
+      enableServiceLinks: false
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: home-pvc
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- with $val.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $val.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: registry
           ports:
             - containerPort: 5000
           image: docker.io/registry:2
-          volumeMounts:
-            - mountPath: /var/lib/registry
-              name: data
-              subPath: registry
+          env:
+            - name: REGISTRY_STORAGE
+              value: s3
+            - name: REGISTRY_STORAGE_S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $val.secretName }}
+                  key: bucket
+            - name: REGISTRY_STORAGE_S3_V4AUTH
+              value: "true"
+            - name: REGISTRY_STORAGE_S3_SECURE
+              value: {{ ($val.secureEndpoint | default "true") | quote }}
+            - name: REGISTRY_STORAGE_S3_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $val.secretName }}
+                  key: region
+            - name: REGISTRY_STORAGE_S3_REGIONENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $val.secretName }}
+                  key: region-endpoint
+            - name: REGISTRY_STORAGE_S3_ACCESSKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $val.secretName }}
+                  key: access-key
+            - name: REGISTRY_STORAGE_S3_SECRETKEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $val.secretName }}
+                  key: secret-key
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: {{ .Release.Namespace }}
-  name: registry
+  namespace: {{ $.Release.Namespace }}
+  name: registry-{{ $key }}
 spec:
   ports:
     - name: http
@@ -43,4 +77,5 @@ spec:
       protocol: TCP
       targetPort: 5000
   selector:
-    name: registry
+    name: registry-{{ $key }}
+{{- end }}

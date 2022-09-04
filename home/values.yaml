@@ -25,6 +25,8 @@ mqtt:
   service:
     annotations: {}
 
+registries: {}
+
 docker:
   enabled: false
   env: []

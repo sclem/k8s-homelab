@@ -46,6 +46,10 @@ resource "oci_core_instance" "main" {
     nsg_ids                   = var.nsg_ids
     freeform_tags             = var.tags
   }
+
+  lifecycle {
+    ignore_changes = [source_details[0].source_id]
+  }
 }
 
 data "oci_core_vnic_attachments" "main" {

@@ -133,6 +133,46 @@ releases:
       publishService:
         enabled: true
 
+- name: ingress-nginx-cloud-oracle
+  labels:
+    app: ingress-nginx-cloud-oracle
+    system: access
+  namespace: ingress-nginx-cloud-oracle
+  createNamespace: true
+  chart: ingress-nginx/ingress-nginx
+  version: 4.2.0
+  values:
+  - controller:
+      ingressClassResource:
+        default: false
+        name: nginx-cloud-oracle
+        controllerValue: k8s.io/ingress-nginx-cloud-oracle
+      service:
+        enabled: true
+        type: NodePort
+        nodePorts:
+          http: 31080
+          https: 31443
+        externalTrafficPolicy: Local
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: In
+                values:
+                - oracle
+      ingressClass: nginx-cloud-oracle
+      tolerations:
+      - key: cloud
+        operator: Exists
+        effect: NoExecute
+      dnsPolicy: ClusterFirstWithHostNet
+      kind: DaemonSet
+      publishService:
+        enabled: false
+
 - name: ingress-nginx-lan
   labels:
     app: ingress-nginx-lan

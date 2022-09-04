@@ -39,3 +39,7 @@ variable "enable_ssh" {
   type    = bool
   default = false
 }
+
+variable "bucket_names" {
+  type = list(string)
+}
