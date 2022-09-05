@@ -154,6 +154,10 @@ releases:
           http: 31080
           https: 31443
         externalTrafficPolicy: Local
+        ipFamilyPolicy: RequireDualStack
+        ipFamilies:
+          - IPv4
+          - IPv6
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

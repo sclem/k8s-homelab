@@ -26,6 +26,10 @@ variable "cloudflare_zone" {
   type = string
 }
 
+variable "cloudflare_zone_lb" {
+  type = string
+}
+
 variable "config_file_profile" {
   type    = string
   default = "DEFAULT"
@@ -42,4 +46,8 @@ variable "enable_ssh" {
 
 variable "bucket_names" {
   type = list(string)
+}
+
+variable "lb_hostname" {
+  type = string
 }
