@@ -27,7 +27,7 @@ spec:
               - key: cloud
                 operator: In
                 values:
-                - vultr
+                - oracle
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

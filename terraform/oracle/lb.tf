@@ -1,14 +1,22 @@
 locals {
   lb_mapping = {
-    "31443" = {
+    https = {
       protocol = "TCP"
-      name     = "https"
       port     = 443
+      nodePort = 31443
     }
-    "31080" = {
+    http = {
       protocol = "TCP"
-      name     = "http"
       port     = 80
+      nodePort = 31080
+    }
+    stun = {
+      protocol = "UDP"
+      port     = 3478
+      nodePort = 30478
+
+      healthcheck_protocol = "TCP"
+      healthcheck_port     = 31080
     }
   }
 }
@@ -24,74 +32,37 @@ resource "oci_network_load_balancer_network_load_balancer" "main" {
   nlb_ip_version                 = "IPV4_AND_IPV6"
 }
 
-resource "oci_network_load_balancer_backend_set" "this" {
+module "oci_nlb_backend_listener" {
   for_each = local.lb_mapping
-  health_checker {
-    protocol = each.value.protocol
-    port     = each.key
-  }
-  name                     = "backend-homelab-nlb-${each.value.name}"
+  source   = "./modules/oci_nlb_backend_listener"
+
+  name                     = "${each.key}-homelab-nlb"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  policy                   = "FIVE_TUPLE"
-  ip_version               = "IPV4"
-  is_preserve_source       = true
+  ipv6                     = false
+  target_id                = module.k3s_node["oci-cloud-arm"].instance.id
+
+  listener_port        = each.value.port
+  backend_port         = each.value.nodePort
+  protocol             = each.value.protocol
+  healthcheck_port     = try(each.value.healthcheck_port, each.value.nodePort)
+  healthcheck_protocol = try(each.value.healthcheck_protocol, each.value.protocol)
 }
 
-resource "oci_network_load_balancer_backend_set" "this-v6" {
-  for_each = local.lb_mapping
-  health_checker {
-    protocol = each.value.protocol
-    port     = each.key
-  }
-  name                     = "backend-homelab-nlb-v6-${each.value.name}"
+module "oci_nlb_backend_listener_v6" {
+  for_each   = local.lb_mapping
+  source     = "./modules/oci_nlb_backend_listener"
+  depends_on = [module.oci_nlb_backend_listener]
+
+  name                     = "${each.key}-homelab-nlb-v6"
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  policy                   = "FIVE_TUPLE"
-  ip_version               = "IPV6"
-  is_preserve_source       = true
-}
+  ipv6                     = true
+  ip_address               = module.k3s_node["oci-cloud-arm"].public_ipv6
 
-resource "oci_network_load_balancer_listener" "this" {
-  for_each                 = oci_network_load_balancer_backend_set.this
-  default_backend_set_name = each.value.name
-  name                     = "listener-${each.value.name}"
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  port                     = local.lb_mapping[each.value.health_checker[0].port].port
-  protocol                 = local.lb_mapping[each.value.health_checker[0].port].protocol
-  ip_version               = "IPV4"
-}
-
-resource "oci_network_load_balancer_listener" "this-v6" {
-  for_each                 = oci_network_load_balancer_backend_set.this-v6
-  default_backend_set_name = each.value.name
-  name                     = "listener-v6-${each.value.name}"
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  port                     = local.lb_mapping[each.value.health_checker[0].port].port
-  protocol                 = local.lb_mapping[each.value.health_checker[0].port].protocol
-  ip_version               = "IPV6"
-}
-
-resource "oci_network_load_balancer_backend" "this" {
-  for_each = oci_network_load_balancer_backend_set.this
-
-  backend_set_name         = each.value.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  port                     = each.value.health_checker[0].port
-
-  name      = "backend-${each.value.name}"
-  target_id = module.k3s_node["oci-cloud-arm"].instance.id
-}
-
-resource "oci_network_load_balancer_backend" "this-v6" {
-  depends_on = [oci_network_load_balancer_backend.this]
-  for_each   = oci_network_load_balancer_backend_set.this-v6
-
-  backend_set_name         = each.value.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.main.id
-  port                     = each.value.health_checker[0].port
-
-  name = "backend-v6-${each.value.name}"
-  //target_id  = module.k3s_node["oci-cloud-arm"].instance.id
-  ip_address = module.k3s_node["oci-cloud-arm"].public_ipv6
+  listener_port        = each.value.port
+  backend_port         = each.value.nodePort
+  protocol             = each.value.protocol
+  healthcheck_port     = try(each.value.healthcheck_port, each.value.nodePort)
+  healthcheck_protocol = try(each.value.healthcheck_protocol, each.value.protocol)
 }
 
 locals {
