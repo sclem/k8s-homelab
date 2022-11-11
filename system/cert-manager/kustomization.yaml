@@ -1,0 +1,8 @@
+helmCharts:
+- name: cert-manager
+  releaseName: cert-manager
+  namespace: kube-system
+  version: v1.8.1
+  repo: https://charts.jetstack.io
+  valuesInline:
+    installCRDs: true

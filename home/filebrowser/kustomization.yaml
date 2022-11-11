@@ -1,0 +1,136 @@
+namespace: home
+
+configMapGenerator:
+- name: filebrowser-domain
+  files:
+  - config/domain
+  - config/domain-wan
+
+secretGenerator:
+- name: yubikey-cert
+  files:
+  - config/ca.crt
+  options:
+    disableNameSuffixHash: true
+
+helmCharts:
+- name: filebrowser
+  releaseName: filebrowser
+  version: 1.4.2
+  repo: https://k8s-at-home.com/charts/
+  valuesInline:
+    podSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 2000
+      runAsNonRoot: true
+    env:
+      TZ: "America/New_York"
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx-lan
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header X-User admin;
+        hosts:
+          - host: FILEBROWSER_HOST
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - FILEBROWSER_HOST
+      wg:
+        enabled: true
+        ingressClassName: nginx-wg
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          sclem.dev/external-dns: "true"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header X-User admin;
+        hosts:
+          - host: FILEBROWSER_HOST
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - FILEBROWSER_HOST
+      wan:
+        enabled: true
+        ingressClassName: nginx-cloud-oracle
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          sclem.dev/external-dns: "true"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header X-User admin;
+        hosts:
+          - host: FILEBROWSER_HOST_WAN
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - FILEBROWSER_HOST_WAN
+            secretName: filebrowser-wan-tls
+    persistence:
+      config:
+        enabled: true
+        accessMode: ReadWriteOnce
+        storageClass: local-storage
+        size: 1Gi
+      data:
+        enabled: true
+        accessMode: ReadWriteOnce
+        storageClass: local-storage
+        size: 1Ti
+
+resources:
+- ./pv.yaml
+
+patchesStrategicMerge:
+- ./patches/ingress-wan.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: filebrowser-domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+      name: filebrowser
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true
+- source:
+    kind: ConfigMap
+    name: filebrowser-domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+      name: filebrowser-wg
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true
+- source:
+    kind: ConfigMap
+    name: filebrowser-domain
+    fieldPath: data.domain-wan
+  targets:
+  - select:
+      kind: Ingress
+      name: filebrowser-wan
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true

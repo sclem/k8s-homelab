@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 3Ti
+  claimRef:
+    kind: PersistentVolumeClaim
+    name: data-postgres-0
+    namespace: storage
+  local:
+    path: /data/raid/k8s/postgres
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - videx
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  volumeMode: Filesystem

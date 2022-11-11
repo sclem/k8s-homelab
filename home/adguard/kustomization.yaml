@@ -1,0 +1,29 @@
+configMapGenerator:
+- name: adguard-config
+  files:
+  - config/AdGuardHome.yaml
+- name: adguard-domain
+  files:
+  - config/domain
+
+resources:
+- ./deployment.yaml
+- ./service.yaml
+- ./service-dns-tcp.yaml
+- ./service-dns-udp.yaml
+- ./ingress.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: adguard-domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+      name: adguard
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true

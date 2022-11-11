@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: headscale-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    sclem.dev/external-dns: "true"
+spec:
+  ingressClassName: nginx-cloud-oracle
+  rules:
+  - host: dummy.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: headscale
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - dummy.local
+    secretName: tls-headscale

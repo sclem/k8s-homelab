@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mqtt
+spec:
+  selector:
+    matchLabels:
+      name: mqtt
+  template:
+    metadata:
+      labels:
+        name: mqtt
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      volumes:
+        - name: db
+          emptyDir: {}
+        - name: passwd
+          emptyDir: {}
+        - name: passwd-conf
+          secret:
+            secretName: mqtt-auth
+        - name: conf
+          configMap:
+            name: mosquitto-config
+      initContainers:
+        - name: mqtt-passwd
+          image: docker.io/eclipse-mosquitto:1.6.8
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - "cp /passwd-conf/* /passwd/ && mosquitto_passwd -U /passwd/passwd.conf"
+          volumeMounts:
+            - name: passwd
+              mountPath: /passwd
+            - name: passwd-conf
+              mountPath: /passwd-conf
+      containers:
+        - name: mqtt
+          ports:
+            - containerPort: 1883
+          image: docker.io/eclipse-mosquitto:1.6.8
+          volumeMounts:
+            - name: db
+              mountPath: /var/lib/mosquitto
+            - name: conf
+              mountPath: /mosquitto/config
+            - name: passwd
+              mountPath: /passwd

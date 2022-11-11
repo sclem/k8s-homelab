@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: overseerr
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5055
+  selector:
+    name: overseerr

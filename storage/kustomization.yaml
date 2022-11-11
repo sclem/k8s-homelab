@@ -1,0 +1,8 @@
+namespace: storage
+
+resources:
+- ./namespace.yaml
+- ./postgres
+- ./redis
+- ./minio
+- ./registry

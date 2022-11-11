@@ -1,0 +1,41 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: pproxy
+spec:
+  selector:
+    matchLabels:
+      name: pproxy
+  template:
+    metadata:
+      labels:
+        name: pproxy
+    spec:
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: In
+                values:
+                - oracle
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: pproxy
+          image: docker.io/mosajjal/pproxy:2.7.8-uv
+          stdin: true
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "true"
+          args:
+            - -vv

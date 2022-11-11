@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: requestrr
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 4545
+  selector:
+    name: requestrr

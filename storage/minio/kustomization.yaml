@@ -1,0 +1,59 @@
+secretGenerator:
+- name: minio-root-user
+  envs:
+  - config/minio-root-user.env
+
+configMapGenerator:
+- name: minio-domain
+  envs:
+  - config/minio-domain.env
+
+helmCharts:
+- name: minio
+  releaseName: minio
+  version: 11.10.11
+  repo: https://charts.bitnami.com/bitnami
+  valuesInline:
+    auth:
+      existingSecret: minio-root-user
+    ingress:
+      enabled: true
+      ingressClassName: nginx-lan
+      hostname: minio-console.local
+      tls: true
+      extraTls:
+      - hosts:
+        - minio.local
+    apiIngress:
+      enabled: true
+      tls: true
+      extraTls:
+      - hosts:
+        - minio.local
+      ingressClassName: nginx-lan
+      hostname: minio.local
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/proxy-buffering: "off"
+        nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    persistence:
+      enabled: true
+      storageClass: local-storage
+
+resources:
+- ./pv.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: minio-domain
+    fieldPath: data.DOMAIN
+  targets:
+  - select:
+      kind: Ingress
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      delimiter: .
+      index: 1

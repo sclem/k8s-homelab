@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-lan-sonarr
+spec:
+  ingressClassName: nginx-lan
+  rules:
+  - host: sonarr.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: sonarr
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - sonarr.local
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-wg-sonarr
+  annotations:
+    sclem.dev/external-dns: "true"
+spec:
+  ingressClassName: nginx-wg
+  rules:
+  - host: sonarr.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: sonarr
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - sonarr.local

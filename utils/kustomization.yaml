@@ -1,0 +1,61 @@
+configMapGenerator:
+- name: cluster-issuer-email
+  envs:
+  - config/cluster-issuer-email.env
+- name: cert-domain
+  files:
+  - config/cert-domain
+
+secretGenerator:
+- name: cloudflare-token
+  namespace: kube-system
+  envs:
+  - config/cloudflare-token.env
+  options:
+    disableNameSuffixHash: true
+
+resources:
+- ./metallb.yaml
+- ./cluster-issuer.yaml
+- ./wildcard-cert.yaml
+- ./storageclass.yaml
+- ./plex-pv.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: cluster-issuer-email
+    fieldPath: data.email
+  targets:
+  - select:
+      kind: ClusterIssuer
+      name: letsencrypt
+    fieldPaths:
+    - spec.acme.email
+    options:
+      create: true
+- source:
+    kind: ConfigMap
+    name: cert-domain
+    fieldPath: data.cert-domain
+  targets:
+  - select:
+      kind: Certificate
+    fieldPaths:
+    - spec.commonName
+    - spec.dnsNames.0
+    options:
+      create: true
+- source:
+    kind: ConfigMap
+    name: cert-domain
+    fieldPath: data.cert-domain
+  targets:
+  - select:
+      kind: Certificate
+    fieldPaths:
+    - spec.dnsNames.1
+    options:
+      delimiter: "*."
+      index: 1
+      create: true

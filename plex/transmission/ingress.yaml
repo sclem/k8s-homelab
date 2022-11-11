@@ -1,0 +1,44 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-lan-transmission
+spec:
+  ingressClassName: nginx-lan
+  rules:
+  - host: transmission.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: transmission
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - transmission.local
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-wg-transmission
+  annotations:
+    sclem.dev/external-dns: "true"
+spec:
+  ingressClassName: nginx-wg
+  rules:
+  - host: transmission.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: transmission
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - transmission.local

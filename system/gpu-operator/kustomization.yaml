@@ -1,0 +1,18 @@
+namespace: gpu-operator
+
+helmCharts:
+- name: gpu-operator
+  releaseName: gpu-operator
+  version: v1.11.0
+  repo: https://helm.ngc.nvidia.com/nvidia
+  valuesInline:
+    node-feature-discovery:
+      worker:
+        nodeSelector:
+          sclem.dev/enable-gpu: "true"
+    operator:
+      defaultRuntime: containerd
+    driver:
+      enabled: false
+    toolkit:
+      enabled: false

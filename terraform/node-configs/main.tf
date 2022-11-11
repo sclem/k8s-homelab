@@ -34,6 +34,7 @@ resource "kubernetes_labels" "oci-node" {
   for_each    = local.oci_instances
   api_version = "v1"
   kind        = "Node"
+  force       = true
   metadata {
     name = each.key
   }
@@ -46,10 +47,12 @@ resource "kubernetes_annotations" "oci-node" {
   for_each    = local.oci_instances
   api_version = "v1"
   kind        = "Node"
+  force       = true
   metadata {
     name = each.key
   }
   annotations = {
-    "oci.oraclecloud.com/compartment-id" = each.value.instance.compartment_id
+    "oci.oraclecloud.com/compartment-id"           = each.value.instance.compartment_id
+    "flannel.alpha.coreos.com/public-ip-overwrite" = each.value.public_ipv4
   }
 }

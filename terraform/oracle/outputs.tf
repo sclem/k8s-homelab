@@ -6,6 +6,14 @@ output "lb" {
   value = oci_network_load_balancer_network_load_balancer.main
 }
 
+output "vault" {
+  value = oci_kms_vault.main
+}
+
+output "kms_key" {
+  value = oci_kms_key.main
+}
+
 data "terraform_remote_state" "wg_k8s" {
   backend = "s3"
 

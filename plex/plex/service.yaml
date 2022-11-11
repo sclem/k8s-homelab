@@ -1,0 +1,85 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: plex-direct-32400
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 32400
+      protocol: TCP
+      targetPort: 32400
+      nodePort: 32400
+  selector:
+    name: plex
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: plex
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "plex"
+    metallb.universe.tf/address-pool: skynet
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 32400
+    - name: http-32400
+      port: 32400
+      protocol: TCP
+      targetPort: 32400
+    - name: plex-3005
+      port: 3005
+      targetPort: 3005
+      protocol: TCP
+    - name: plex-8324
+      port: 8324
+      targetPort: 8324
+      protocol: TCP
+    - name: plex-32469
+      port: 32469
+      targetPort: 32469
+      protocol: TCP
+  selector:
+    name: plex
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: plex-discovery
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "plex"
+    metallb.universe.tf/address-pool: skynet
+spec:
+  type: LoadBalancer
+  ports:
+    - name: plex-1900
+      port: 1900
+      protocol: UDP
+      targetPort: 1900
+    - name: plex-32410
+      port: 32410
+      targetPort: 32410
+      protocol: UDP
+    - name: plex-32411
+      port: 32411
+      targetPort: 32411
+      protocol: UDP
+    - name: plex-32412
+      port: 32412
+      targetPort: 32412
+      protocol: UDP
+    - name: plex-32413
+      port: 32413
+      targetPort: 32413
+      protocol: UDP
+    - name: plex-32414
+      port: 32414
+      targetPort: 32414
+      protocol: UDP
+  selector:
+    name: plex

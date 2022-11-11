@@ -98,6 +98,6 @@ resource "kubernetes_secret" "wg_conf" {
 
   data = {
     conf = data.wireguard_config_document.doc.conf
-    forward_port = mullvad_port_forward.wireguard.port
+    forward-port = mullvad_port_forward.wireguard.port
   }
 }

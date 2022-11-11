@@ -1,0 +1,49 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: adguard
+spec:
+  selector:
+    matchLabels:
+      name: adguard
+  template:
+    metadata:
+      labels:
+        name: adguard
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      volumes:
+        - name: work
+          emptyDir: {}
+        - name: conf
+          emptyDir: {}
+        - name: conf-ro
+          configMap:
+            name: adguard-config
+      # adguard wants to write config
+      initContainers:
+        - name: config-copy
+          image: docker.io/busybox:1.29.3
+          command:
+          - sh
+          - -c
+          - "cp /conftemp/* /conf/"
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+            - name: conf-ro
+              mountPath: /conftemp
+      containers:
+        - name: adguard
+          ports:
+            - containerPort: 53
+            - containerPort: 80
+          image: docker.io/adguard/adguardhome
+          volumeMounts:
+            - mountPath: /opt/adguardhome/work
+              name: work
+            - mountPath: /opt/adguardhome/conf
+              name: conf

@@ -1,0 +1,76 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+  name: nginx-lan-plex
+spec:
+  ingressClassName: nginx-lan
+  rules:
+  - host: plex.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: plex
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - plex.local
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    sclem.dev/external-dns: "true"
+  name: nginx-wg-plex
+spec:
+  ingressClassName: nginx-wg
+  rules:
+  - host: plex.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: plex
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - plex.local
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    sclem.dev/external-dns: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+  name: nginx-cloud-oracle-plex
+spec:
+  ingressClassName: nginx-cloud-oracle
+  rules:
+  - host: plex.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: plex
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - plex.local
+    secretName: letsencrypt-plex-wan

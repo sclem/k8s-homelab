@@ -1,0 +1,30 @@
+namespace: home
+
+configMapGenerator:
+- name: domain
+  files:
+  - config/domain
+
+secretGenerator:
+- name: basic-auth
+  files:
+  - config/auth
+  type: Opaque
+
+resources:
+- ./service.yaml
+- ./ingress.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true

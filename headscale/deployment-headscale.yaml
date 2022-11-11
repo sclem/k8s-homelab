@@ -1,0 +1,74 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: headscale
+spec:
+  selector:
+    matchLabels:
+      name: headscale
+  template:
+    metadata:
+      labels:
+        name: headscale
+    spec:
+      tolerations:
+        - key: cloud
+          operator: Exists
+          effect: NoExecute
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: cloud
+                operator: In
+                values:
+                - oracle
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      volumes:
+      - name: config
+        configMap:
+          name: headscale-config
+      - name: acl
+        configMap:
+          name: headscale-acl
+      - name: socket
+        emptyDir: {}
+      - name: private-key
+        secret:
+          secretName: headscale-private-key
+      containers:
+      - name: headscale
+        ports:
+        - containerPort: 8080
+        - containerPort: 3478
+        image: docker.io/headscale/headscale:0.16.4
+        envFrom:
+          - secretRef:
+              name: headscale-env
+        env:
+        - name: GIN_MODE
+          value: release
+        - name: HEADSCALE_LISTEN_ADDR
+          value: ":8080"
+        - name: HEADSCALE_ACL_POLICY_PATH
+          value: /var/run/headscale/acl.hujson
+        - name: HEADSCALE_PRIVATE_KEY_PATH
+          value: /var/run/headscale/private.key
+        - name: HEADSCALE_UNIX_SOCKET
+          value: /var/run/headscale/headscale.sock
+        command: ["headscale", "serve"]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/headscale
+        - name: socket
+          mountPath: /var/run/headscale
+        - name: private-key
+          mountPath: /var/run/headscale/private.key
+          subPath: key
+        - name: acl
+          mountPath: /var/run/headscale/acl.hujson
+          subPath: acl.hujson

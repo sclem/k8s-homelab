@@ -1,8 +1,0 @@
-{{- define "shared.ingress" }}
-{{ $namespace := .Release.Namespace }}
-{{- range $key, $val := .Values.ingress }}
-{{- range $_, $data := $val }}
-{{- include "shared.ingress.tpl" ($data | mergeOverwrite (dict "service" $key "namespace" $namespace)) }}
-{{- end }}
-{{- end }}
-{{- end }}

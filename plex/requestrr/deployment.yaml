@@ -1,0 +1,31 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: requestrr
+  labels:
+    app: plex
+spec:
+  selector:
+    matchLabels:
+      name: requestrr
+  template:
+    metadata:
+      labels:
+        name: requestrr
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: plex-pvc
+      containers:
+        - name: requestrr
+          ports:
+            - containerPort: 4545
+          image: docker.io/darkalfx/requestrr:v2.1.2
+          volumeMounts:
+            - mountPath: /root/config
+              name: data
+              subPath: requestrr/config
+          env:
+            - name: TZ
+              value: "America/New_York"

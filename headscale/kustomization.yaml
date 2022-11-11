@@ -1,0 +1,47 @@
+namespace: headscale
+
+configMapGenerator:
+- name: headscale-config
+  files:
+  - config/config.yaml
+- name: headscale-acl
+  files:
+  - config/acl.hujson
+- name: headscale-domain
+  files:
+  - config/domain
+
+secretGenerator:
+- name: headscale-private-key
+  files:
+  - config/key
+- name: headscale-env
+  envs:
+  - config/headscale.env
+
+resources:
+- ./namespace.yaml
+- ./deployment-headscale.yaml
+- ./service-headscale.yaml
+- ./service-headscale-stun.yaml
+- ./statefulset-db.yaml
+- ./service-db.yaml
+- ./ingress.yaml
+
+patchesStrategicMerge:
+- ./patches/headscale-ingress.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: headscale-domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+      name: headscale-ingress
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true

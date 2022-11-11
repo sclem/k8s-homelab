@@ -1,0 +1,89 @@
+namespace: iot
+
+configMapGenerator:
+- name: hass-urls
+  envs:
+  - config/hass/url.env
+- name: mosquitto-config
+  files:
+  - config/mosquitto/mosquitto.conf
+secretGenerator:
+- name: mqtt-auth
+  files:
+  - config/mosquitto/passwd.conf
+
+resources:
+- ./namespace.yaml
+- ./statefulset-homeassistant.yaml
+- ./service-hass.yaml
+- ./service-hass-wemo.yaml
+- ./deployment-mosquitto.yaml
+- ./service-mqtt.yaml
+- ./pv.yaml
+- ./ingress.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: hass-urls
+    fieldPath: data.WEMO_URL
+  targets:
+  - select:
+      kind: Deployment
+      name: hass
+    fieldPaths:
+    - spec.template.spec.containers.[name=hass].env.[name=PYWEMO_CALLBACK_ADDRESS].value
+    options:
+      delimiter: ":"
+      index: 0
+      create: true
+  - select:
+      kind: Service
+      name: hass-wemo
+    fieldPaths:
+    - spec.loadBalancerIP
+- source:
+    kind: ConfigMap
+    name: hass-urls
+    fieldPath: data.DOMAIN_LAN
+  targets:
+  - select:
+      kind: Ingress
+      name: tls-nginx-lan-hass
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+- source:
+    kind: ConfigMap
+    name: hass-urls
+    fieldPath: data.DOMAIN_WG
+  targets:
+  - select:
+      kind: Ingress
+      name: tls-nginx-wg-hass
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+- source:
+    kind: ConfigMap
+    name: hass-urls
+    fieldPath: data.DOMAIN_CLOUD
+  targets:
+  - select:
+      kind: Ingress
+      name: tls-nginx-cloud-oracle-hass
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+- source:
+    kind: ConfigMap
+    name: hass-urls
+    fieldPath: data.DOMAIN_CLOUD_TARGET
+  targets:
+  - select:
+      kind: Ingress
+      name: tls-nginx-cloud-oracle-hass
+    fieldPaths:
+    - metadata.annotations.[external-dns.alpha.kubernetes.io/target]
+    options:
+      create: true

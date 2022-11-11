@@ -1,0 +1,10 @@
+namespace: home
+
+resources:
+- ./adguard
+- ./unifi
+- ./pproxy
+- ./heimdall
+- ./librespeed
+- ./filebrowser
+- ./cameras

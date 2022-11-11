@@ -2,26 +2,33 @@
 
 Opiniated home setup for k8s
 
-Deploys plex/radarr/sonarr/jackett/transmission+vpn.
-
-Deploys unifi controller, adguard, homeassistant, mqtt
-
-Runs on k3s with metallb and nginx ingress. Coredns with k8s_external exposes
-Loadbalancer services to home network.
+| component             | purpose                                               |
+|---                    |---                                                    |
+| metallb               | home LB                                               |
+| cert-manager          | letsencrypt ssl                                       |
+| gpu-operator          | nvidia runtime                                        |
+| oci csi               | pvs for oracle cloud free tier                        |
+| nginx ingress lan     | ingress on home network                               |
+| nginx ingress cloud   | ingress wan                                           |
+| nginx ingress wg      | ingress tailscale                                     |
+| external-dns          | public dns records for wan                            |
+| keycloak              | authn                                                 |
+| storage               | postgres/minio/redis/docker registry                  |
+| utils                 | cluster issuer, metallb pools, pvs, etc               |
+| headscale             | tailscale self-hosted                                 |
+| home                  | adguard/unifi/filebrowser etc                         |
+| iot                   | internet-of-things, hass/mqtt                         |
+| plex                  | plex/radarr/sonarr/jackett/transmission/vpn etc       |
 
 ### install
 
-Managed with helmfile.
+Managed with kustomize.
 
-`helmfile sync`
+`kubectl kustomize --enable-helm . | kubectl apply -f -`
 
 ### terraform
 
 * uses cloudflare r2 as backend
-
-#### cloudflare
-
-* creates access group for tunnel whitelist to plex
 
 #### mullvad
 
@@ -57,12 +64,6 @@ label old gpu system that doesn't work with new cuda:
 kubectl label nodes heavybrick nvidia.com/gpu.deploy.operands=false
 ```
 
-#### metallb default pool
-
-```
-kubectl label node heavybrick location=home
-```
-
 #### cloud node
 
 prevent scheduling:
@@ -71,18 +72,11 @@ prevent scheduling:
 kubectl taint node cloud cloud=<provider>:NoExecute
 ```
 
-configure wireguard externally, set --flannel-iface=k8s and
-flannel-backend=host-gw. Add pod routes for 10.42.0.0/24 etc for each node
-manually. Requires manual intervention to add node to cluster, keeps from
-having extra level of indirection with vxlan or wireguard-in-wireguard.
+#### oci lb
 
-#### vultr csi
-
-Installed with kustomize
-
-```
-kubectl apply -k ./vultr-csi/
-```
+LB created with terraform in terraform/oracle, not via k8s cloud controller.
+Uses nodePorts on oracle cloud node and external dns cname record for
+forwarding.
 
 #### oci csi
 
@@ -104,5 +98,5 @@ kubectl label node oci-cloud-arm failure-domain.beta.kubernetes.io/zone=US-ASHBU
 #### ingress
 
 Separate nginx ingress classes are created per network, "lan", "wg", and
-"cloud" for home (with ssl), tailscale, and wan access respectively. Allows
+"cloud-oracle" for home (with ssl), tailscale, and wan access respectively. Allows
 selective control over what is exposed per-network.

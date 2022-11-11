@@ -1,0 +1,7 @@
+
+resources:
+- metallb
+- ingress-nginx
+- cert-manager
+- gpu-operator
+- external-dns

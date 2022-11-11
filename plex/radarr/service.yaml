@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: radarr
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 7878
+  selector:
+    name: radarr

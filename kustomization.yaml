@@ -1,0 +1,9 @@
+resources:
+- system
+- storage
+- oracle-ccm
+- utils
+- headscale
+- home
+- iot
+- plex

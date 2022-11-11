@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: hass-wemo
+spec:
+  type: LoadBalancer
+  loadBalancerIP: WEMO_IP
+  externalTrafficPolicy: Local
+  ports:
+    - name: wemo-upnp
+      port: 8989
+      protocol: TCP
+      targetPort: 8989
+  selector:
+    name: hass

@@ -1,0 +1,28 @@
+
+configMapGenerator:
+- name: unifi-domain
+  files:
+  - config/domain
+
+resources:
+- ./statefulset.yaml
+- ./service.yaml
+- ./service-tcp.yaml
+- ./service-udp.yaml
+- ./ingress.yaml
+- ./pv.yaml
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: unifi-domain
+    fieldPath: data.domain
+  targets:
+  - select:
+      kind: Ingress
+      name: unifi
+    fieldPaths:
+    - spec.rules.0.host
+    - spec.tls.0.hosts.0
+    options:
+      create: true
