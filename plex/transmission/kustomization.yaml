@@ -1,4 +1,22 @@
+namespace: plex
+
+configMapGenerator:
+- name: terraform-vpn-module
+  files:
+  - terraform/main.tf
+  - terraform/variables.tf
+- name: transmission-env
+  envs:
+  - config/transmission.env
+
+secretGenerator:
+- name: terraform-vpn-env
+  envs:
+  - config/vpn-terraform.env
+
 resources:
+- serviceaccount.yaml
+- secret-vpn-conf.yaml
 - deployment.yaml
 - service.yaml
 - ingress.yaml

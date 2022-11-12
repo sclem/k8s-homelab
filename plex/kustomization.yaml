@@ -1,9 +1,6 @@
 namespace: plex
 
 configMapGenerator:
-- name: transmission-env
-  envs:
-  - config/transmission.env
 - name: plex-dns
   envs:
   - config/domains.env

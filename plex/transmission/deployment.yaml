@@ -13,7 +13,13 @@ spec:
       labels:
         name: transmission
     spec:
+      serviceAccountName: vpn-tf-sa
       volumes:
+        - name: terraform
+          configMap:
+            name: terraform-vpn-module
+        - name: terraform-workdir
+          emptyDir: {}
         - name: wg-conf
           secret:
             secretName: vpn-wg-conf
@@ -26,7 +32,11 @@ spec:
           command:
           - "/bin/sh"
           - "-c"
-          - "test ! -d /config/flood-for-transmission && curl -o- -sL https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.tar.gz | tar xzf - -C /config || exit 0"
+          - |-
+            test ! -d /config/flood-for-transmission && \
+              curl -o- -sL https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.tar.gz | \
+              tar xzf - -C /config || \
+              exit 0
           volumeMounts:
           - name: data
             mountPath: /config
@@ -35,6 +45,30 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
             runAsNonRoot: true
+          # recreate vpn config on startup
+        - name: vpn-setup
+          image: docker.io/hashicorp/terraform:1.3.4
+          envFrom:
+            - secretRef:
+                name: terraform-vpn-env
+          command:
+          - "/bin/sh"
+          - "-c"
+          - |-
+            cp /tf/mullvad/* /tf/work
+            cd /tf/work
+            terraform init
+            terraform taint wireguard_asymmetric_key.wg || true
+            terraform import kubernetes_secret.wg_conf plex/vpn-wg-conf || true
+            terraform apply -auto-approve
+          volumeMounts:
+          - name: terraform
+            mountPath: /tf/mullvad
+          - name: terraform-workdir
+            mountPath: /tf/work
+          - name: data
+            mountPath: /tf/work/.terraform
+            subPath: transmission/terraform-deps
       containers:
         - name: vpn
           securityContext:
