@@ -1,0 +1,41 @@
+namespace: dev
+
+secretGenerator:
+- name: gitlab-runner-s3
+  envs:
+  - config/s3.env
+- name: gitlab-runner-token
+  envs:
+  - config/token.env
+
+helmCharts:
+- name: gitlab-runner
+  releaseName: gitlab-runner
+  version: 0.46.1
+  repo: https://charts.gitlab.io
+  namespace: dev
+  valuesInline:
+    gitlabUrl: https://gitlab.com/
+    rbac:
+      create: true
+    runners:
+      locked: false
+      protected: false
+      secret: gitlab-runner-token
+      cache:
+        secretName: gitlab-runner-s3
+      config: |
+        [[runners]]
+          [runners.kubernetes]
+            namespace = "{{.Release.Namespace}}"
+            image = "ubuntu:16.04"
+          [runners.cache]
+            Type = "s3"
+            Path = "runner"
+            Shared = true
+            [runners.cache.s3]
+              ServerAddress = "http://minio.storage.svc.cluster.local:9000"
+              BucketName = "gitlab-runner-cache"
+              BucketLocation = "us-east-1"
+              Insecure = true
+              AuthenticationType = "access-key"

@@ -1,4 +1,12 @@
 
+configMapGenerator:
+- name: coredns-custom
+  namespace: kube-system
+  files:
+  - config/coredns-custom.server
+  options:
+    disableNameSuffixHash: true
+
 resources:
 - metallb
 - ingress-nginx

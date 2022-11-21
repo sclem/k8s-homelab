@@ -1,0 +1,27 @@
+stages:
+- containers
+
+build-cups:
+  stage: containers
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables:
+    IMAGE_NAME: cups-brother
+  script:
+    - |
+      mkdir -p /kaniko/.docker && \
+        echo '{
+          "auths": {
+            "https://'"$HOMELAB_REGISTRY"'": {
+              "username": "'"$HOMELAB_REGISTRY_USER"'",
+              "password": "'"$HOMELAB_REGISTRY_PASSWORD"'"
+            }
+          }
+        }' > /kaniko/.docker/config.json
+    - |
+      /kaniko/executor \
+      --context ./home/cups \
+      --dockerfile ./home/cups/Dockerfile \
+      --cache=true \
+      --destination $HOMELAB_REGISTRY/$IMAGE_NAME
