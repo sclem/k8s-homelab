@@ -1,0 +1,12 @@
+namespace: home
+
+secretGenerator:
+- name: regcred
+  files:
+  - config/.dockerconfigjson
+  type: kubernetes.io/dockerconfigjson
+
+resources:
+- deployment.yaml
+- service.yaml
+- pvc.yaml

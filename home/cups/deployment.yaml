@@ -1,0 +1,31 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cups
+spec:
+  selector:
+    matchLabels:
+      app: cups
+  template:
+    metadata:
+      labels:
+        app: cups
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: cups
+        image: registry.sclem.dev/cups-brother
+        ports:
+        - containerPort: 631
+        volumeMounts:
+        - name: cups-config
+          mountPath: /etc/cups
+        - name: cups-data
+          mountPath: /var/spool/cups
+      volumes:
+      - name: cups-config
+        persistentVolumeClaim:
+          claimName: cups-config
+      - name: cups-data
+        emptyDir: {}
