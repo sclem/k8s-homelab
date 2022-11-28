@@ -1,0 +1,15 @@
+namespace: iot
+
+configMapGenerator:
+- name: mosquitto-config
+  files:
+  - config/mosquitto.conf
+
+secretGenerator:
+- name: mqtt-auth
+  files:
+  - config/passwd.conf
+
+resources:
+- ./deployment.yaml
+- ./service.yaml

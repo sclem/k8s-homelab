@@ -20,7 +20,7 @@ spec:
         - name: hass
           ports:
             - containerPort: 8123
-          image: docker.io/homeassistant/home-assistant:2022.6
+          image: docker.io/homeassistant/home-assistant:2022.11
           env:
             - name: TZ
               value: "America/New_York"
