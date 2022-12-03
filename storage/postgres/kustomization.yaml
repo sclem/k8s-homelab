@@ -1,3 +1,5 @@
+namespace: storage
+
 secretGenerator:
 - name: pg-password
   envs:
