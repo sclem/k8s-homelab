@@ -12,6 +12,8 @@ helmCharts:
   releaseName: zigbee2mqtt
   namespace: iot
   valuesInline:
+    image:
+      tag: 1.28.4
     ingress:
       main:
         enabled: true
