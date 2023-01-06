@@ -8,6 +8,7 @@ spec:
   ports:
     - name: http
       port: 80
+      nodePort: 31888
       protocol: TCP
       targetPort: 8080
       # curl default port for proxy is 1080
