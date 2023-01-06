@@ -5,6 +5,9 @@ configMapGenerator:
   envs:
   - config/domain.env
 
+# udev rule on host
+#SUBSYSTEM=="tty",ENV{ID_USB_VENDOR}=="ITEAD",ENV{ID_USB_MODEL}=="SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2",ENV{ID_USB_SERIAL_SHORT}=="20220817114419",SYMLINK+="sonoff0"
+
 helmCharts:
 - name: zigbee2mqtt
   repo: https://k8s-at-home.com/charts/
@@ -35,7 +38,7 @@ helmCharts:
       usb:
         enabled: true
         type: hostPath
-        hostPath: /dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20220817114419-if00
+        hostPath: /dev/sonoff0
         hostPathType: CharDevice
         mountPath: /dev/zigbee0
     affinity:
