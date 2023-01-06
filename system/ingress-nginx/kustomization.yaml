@@ -15,6 +15,11 @@ helmCharts:
         annotations:
           metallb.universe.tf/address-pool: skynet
         externalTrafficPolicy: Local
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+      metrics:
+        enabled: true
       extraArgs:
         default-ssl-certificate: "default/default-tls-cert"
       kind: DaemonSet
@@ -36,6 +41,11 @@ helmCharts:
         enabled: true
         externalTrafficPolicy: Local
         loadBalancerIP: 100.64.0.6
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+      metrics:
+        enabled: true
       nodeSelector:
         kubernetes.io/hostname: videx
       extraArgs:
@@ -66,6 +76,11 @@ helmCharts:
         ipFamilies:
           - IPv4
           - IPv6
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+      metrics:
+        enabled: true
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
