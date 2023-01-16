@@ -1,13 +1,11 @@
 stages:
 - containers
 
-build-cups:
+.build-image-template:
   stage: containers
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  variables:
-    IMAGE_NAME: cups-brother
   script:
     - |
       mkdir -p /kaniko/.docker && \
@@ -21,7 +19,23 @@ build-cups:
         }' > /kaniko/.docker/config.json
     - |
       /kaniko/executor \
-      --context ./home/cups \
-      --dockerfile ./home/cups/Dockerfile \
+      --context $CONTEXT_DIR \
+      --dockerfile $DOCKERFILE \
       --cache=true \
       --destination $HOMELAB_REGISTRY/$IMAGE_NAME
+
+build-cups:
+  extends:
+    - .build-image-template
+  variables:
+    IMAGE_NAME: cups-brother
+    CONTEXT_DIR: ./home/cups
+    DOCKERFILE: ./home/cups/Dockerfile
+
+build-ssh-client:
+  extends:
+    - .build-image-template
+  variables:
+    IMAGE_NAME: ssh-client
+    CONTEXT_DIR: ./containers/ssh-client
+    DOCKERFILE: ./containers/ssh-client/Dockerfile
