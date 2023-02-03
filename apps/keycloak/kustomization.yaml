@@ -1,0 +1,12 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: keycloak-values-common
+  files:
+  - values.yaml
+
+resources:
+- helmrelease.yaml

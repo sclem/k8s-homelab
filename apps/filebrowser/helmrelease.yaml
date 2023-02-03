@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: filebrowser
+spec:
+  chart:
+    spec:
+      chart: filebrowser
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: 1.4.2
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: filebrowser-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: filebrowser-values-env
+    valuesKey: values.yaml

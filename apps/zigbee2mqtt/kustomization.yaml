@@ -1,0 +1,8 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+resources:
+- helmrelease.yaml
+- pv.yaml

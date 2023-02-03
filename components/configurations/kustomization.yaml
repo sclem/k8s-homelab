@@ -1,0 +1,4 @@
+kind: Component
+
+configurations:
+- namereference.yaml

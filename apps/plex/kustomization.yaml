@@ -1,0 +1,10 @@
+kind: Component
+
+configMapGenerator:
+- name: plex-env
+  literals:
+  - PLEX_CLAIM=plex
+
+resources:
+- deployment.yaml
+- service.yaml

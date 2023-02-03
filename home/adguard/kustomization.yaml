@@ -1,29 +1,23 @@
+namespace: home
+
+components:
+- ../../apps/adguard
+
 configMapGenerator:
 - name: adguard-config
+  behavior: replace
   files:
   - config/AdGuardHome.yaml
-- name: adguard-domain
-  files:
-  - config/domain
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: adguard
+  spec:
+    type: LoadBalancer
+    loadBalancerIP: 192.168.1.53
 
 resources:
-- ./deployment.yaml
-- ./service.yaml
-- ./service-dns-tcp.yaml
-- ./service-dns-udp.yaml
-- ./ingress.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: adguard-domain
-    fieldPath: data.domain
-  targets:
-  - select:
-      kind: Ingress
-      name: adguard
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
-    options:
-      create: true
+- config/ingress.yaml

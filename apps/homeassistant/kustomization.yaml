@@ -1,0 +1,7 @@
+kind: Component
+
+resources:
+- statefulset.yaml
+- service.yaml
+- service-wemo.yaml
+- pv.yaml

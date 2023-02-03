@@ -1,9 +1,10 @@
 resources:
+- flux
 - system
-- storage
-- oracle-ccm
 - utils
-- headscale
+- storage
 - home
+- headscale
 - iot
 - plex
+- dev

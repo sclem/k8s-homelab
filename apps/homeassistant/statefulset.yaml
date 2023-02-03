@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hass
+spec:
+  serviceName: hass
+  selector:
+    matchLabels:
+      name: hass
+  template:
+    metadata:
+      labels:
+        name: hass
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: hass
+          ports:
+            - containerPort: 8123
+          image: docker.io/homeassistant/home-assistant:2022.11
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: PYWEMO_CALLBACK_ADDRESS
+              value: WEMO_IP:8989
+          volumeMounts:
+            - mountPath: /config
+              name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: local-storage
+      resources:
+        requests:
+          storage: 1Gi
+      volumeName: hass

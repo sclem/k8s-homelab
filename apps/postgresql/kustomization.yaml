@@ -1,0 +1,12 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: postgresql-values-common
+  literals:
+  - values.yaml=
+
+resources:
+- helmrelease.yaml

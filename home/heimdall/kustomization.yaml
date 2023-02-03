@@ -1,42 +1,12 @@
+namespace: home
+
+components:
+- ../../apps/heimdall
+
 configMapGenerator:
-- name: heimdall-domain
-  envs:
-  - config/domain.env
+- name: heimdall-values-env
+  files:
+  - config/values.yaml
 
-helmCharts:
-- name: heimdall
-  releaseName: heimdall
-  version: 8.4.2
-  repo: https://k8s-at-home.com/charts/
-  valuesInline:
-    persistence:
-      config:
-        enabled: true
-        storageClass: local-storage
-    ingress:
-      main:
-        ingressClassName: nginx-lan
-        enabled: true
-        tls:
-          - hosts:
-              - dashboard.local
-        hosts:
-          - host: dashboard.local
-            paths:
-              - path: /
-                pathType: Prefix
-
-resources:
-- ./pv.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: heimdall-domain
-    fieldPath: data.DOMAIN
-  targets:
-  - select:
-      kind: Ingress
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
+patchesStrategicMerge:
+- pv.yaml

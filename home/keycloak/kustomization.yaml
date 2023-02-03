@@ -1,63 +1,9 @@
 namespace: home
 
-secretGenerator:
-- name: keycloak-db-secret
-  envs:
-  - config/keycloak-db.env
-- name: keycloak-admin-password
-  envs:
-  - config/keycloak-admin-password.env
+components:
+- ../../apps/keycloak
 
 configMapGenerator:
-- name: keycloak-domain
-  envs:
-  - config/domain.env
-
-helmCharts:
-- name: keycloak
-  releaseName: keycloak
-  version: 10.1.6
-  repo: https://charts.bitnami.com/bitnami
-  valuesInline:
-    auth:
-      adminUser: admin
-    proxy: edge
-    service:
-      type: ClusterIP
-    ingress:
-      enabled: true
-      ingressClassName: nginx-lan
-      hostname: KEYCLOAK_HOST
-      extraTls:
-      - hosts:
-        - KEYCLOAK_HOST
-    extraEnvVars:
-    - name: KEYCLOAK_EXTRA_ARGS
-      value: -Dkeycloak.profile.feature.docker=enabled
-    postgresql:
-      enabled: false
-    externalDatabase:
-      existingSecret: keycloak-db-secret
-
-replacements:
-- source:
-    kind: Secret
-    name: keycloak-admin-password
-    fieldPath: data.KEYCLOAK_ADMIN_PASSWORD
-  targets:
-  - select:
-      kind: Secret
-      name: keycloak
-    fieldPaths:
-    - data.admin-password
-- source:
-    kind: ConfigMap
-    name: keycloak-domain
-    fieldPath: data.DOMAIN
-  targets:
-  - select:
-      kind: Ingress
-      name: keycloak
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
+- name: keycloak-values-env
+  files:
+  - config/values.yaml

@@ -1,0 +1,16 @@
+kind: Component
+
+configMapGenerator:
+- name: transmission-env
+  literals:
+  - TRANSMISSION_SPEED_LIMIT_UP_ENABLED=true
+
+secretGenerator:
+- name: vpn-wg-conf
+  literals:
+  - wg0.conf=
+  - forward-port=12345
+
+resources:
+- deployment.yaml
+- service.yaml

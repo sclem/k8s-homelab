@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: adguard
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+  selector:
+    name: adguard

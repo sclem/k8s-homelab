@@ -1,18 +1,11 @@
+kind: Kustomization
+
 namespace: gpu-operator
 
-helmCharts:
-- name: gpu-operator
-  releaseName: gpu-operator
-  version: v22.9.1
-  repo: https://helm.ngc.nvidia.com/nvidia
-  valuesInline:
-    operator:
-      upgradeCRD: true
-    node-feature-discovery:
-      worker:
-        nodeSelector:
-          sclem.dev/enable-gpu: "true"
-    driver:
-      enabled: false
-    toolkit:
-      enabled: false
+components:
+- ../../apps/gpu-operator
+
+configMapGenerator:
+- name: gpu-operator-values-env
+  files:
+  - values.yaml

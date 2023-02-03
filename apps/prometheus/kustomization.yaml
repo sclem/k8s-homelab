@@ -1,0 +1,15 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: prometheus-values-common
+  files:
+  - values.yaml
+- name: prometheus-values-env
+  literals:
+  - values.yaml=
+
+resources:
+- helmrelease.yaml

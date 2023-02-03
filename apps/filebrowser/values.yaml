@@ -1,0 +1,18 @@
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 2000
+  runAsNonRoot: true
+env:
+  TZ: "America/New_York"
+persistence:
+  config:
+    enabled: true
+    accessMode: ReadWriteOnce
+    storageClass: local-storage
+    size: 1Gi
+  data:
+    enabled: true
+    accessMode: ReadWriteOnce
+    storageClass: local-storage
+    size: 1Ti

@@ -9,6 +9,7 @@ Opiniated home setup for k8s
 | gpu-operator          | nvidia runtime                                        |
 | oci csi               | pvs for oracle cloud free tier                        |
 | nginx ingress lan     | ingress on home network                               |
+| nginx ingress dev     | ingress on home dev vlan                              |
 | nginx ingress cloud   | ingress wan                                           |
 | nginx ingress wg      | ingress tailscale                                     |
 | external-dns          | public dns records for wan                            |
@@ -22,20 +23,22 @@ Opiniated home setup for k8s
 
 ### install
 
-Managed with kustomize.
+Helm releases are managed via flux:
 
-`kubectl kustomize --enable-helm . | kubectl apply -f -`
+`flux install` to bootstrap.
+
+Then kustomize:
+
+`kubectl apply -k .`
 
 ### terraform
 
 * uses cloudflare r2 as backend
 
-#### mullvad
+#### oracle
 
-* creates mullvad wireguard peer
-* creates dynamic port forward
-* adds port forward port and peer as kubernetes secret for transmission in plex
-  namespace
+creates free arm instance, free nlb with backend portmapping for nodePort
+services
 
 #### wg-k8s-nodes
 
@@ -45,24 +48,7 @@ wg-quick.
 
 #### nvidia drivers
 
-```
-dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-dnf install akmod-nvidia
-dnf install xorg-x11-drv-nvidia-cuda # or xorg-x11-drv-nvidia-470xx-cuda for older gpu, akmod-nvidia-470xx
-dnf install nvidia-modprobe
-
-distribution=centos8 && \
-    curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.repo | \
-    sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo
-dnf install nvidia-container-toolkit
-```
-
-label old gpu system that doesn't work with new cuda:
-
-```
-kubectl label nodes heavybrick nvidia.com/gpu.deploy.operands=false
-```
+install on gpu hosts with nvidia-container-toolkit manually.
 
 #### cloud node
 
@@ -78,25 +64,8 @@ LB created with terraform in terraform/oracle, not via k8s cloud controller.
 Uses nodePorts on oracle cloud node and external dns cname record for
 forwarding.
 
-#### oci csi
-
-k3s agent opts:
-```
---kubelet-arg=cloud-provider=external
---kubelet-arg=provider-id=<instance ocid>
-```
-
-required label/annotations:
-
-https://github.com/oracle/oci-cloud-controller-manager/blob/906eec8156b64c25e0d9deabe98a6a7c1e9934dd/pkg/util/commons.go#L18
-
-```
-kubectl annotate node oci-cloud-arm  oci-cloud-arm oci.oraclecloud.com/compartment-id=<ocid compartment>
-kubectl label node oci-cloud-arm failure-domain.beta.kubernetes.io/zone=US-ASHBURN-AD-1 --overwrite
-```
-
 #### ingress
 
-Separate nginx ingress classes are created per network, "lan", "wg", and
-"cloud-oracle" for home (with ssl), tailscale, and wan access respectively. Allows
-selective control over what is exposed per-network.
+Separate nginx ingress classes are created per network, "lan", "dev", "wg", and
+"cloud-oracle" for home (with ssl), home dev vlan, tailscale, and wan access
+respectively. Allows selective control over what is exposed per-network.

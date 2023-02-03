@@ -1,8 +1,11 @@
-helmCharts:
-- name: cert-manager
-  releaseName: cert-manager
-  namespace: kube-system
-  version: v1.8.1
-  repo: https://charts.jetstack.io
-  valuesInline:
-    installCRDs: true
+kind: Kustomization
+
+namespace: kube-system
+
+components:
+- ../../apps/cert-manager
+
+configMapGenerator:
+- name: cert-manager-values-env
+  files:
+  - values.yaml

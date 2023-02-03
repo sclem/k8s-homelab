@@ -1,4 +1,7 @@
+namespace: plex
+
+components:
+- ../../apps/sonarr
+
 resources:
-- deployment.yaml
-- service.yaml
-- ingress.yaml
+- config/ingress.yaml

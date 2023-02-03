@@ -1,4 +1,36 @@
+kind: Kustomization
+
+namespace: plex
+
+components:
+- ../../apps/plex
+
+configMapGenerator:
+- name: plex-env
+  behavior: replace
+  envs:
+  - config/plex.env
+
 resources:
-- deployment.yaml
-- service.yaml
-- ingress.yaml
+- config/ingress.yaml
+
+patchesStrategicMerge:
+- patches/ingress-plex-wan.yaml
+- |-
+  kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: plex
+  spec:
+    template:
+      spec:
+        runtimeClassName: nvidia
+        containers:
+        - name: plex
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "compute,video,utility"

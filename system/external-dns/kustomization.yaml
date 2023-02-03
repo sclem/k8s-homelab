@@ -1,25 +1,16 @@
 namespace: external-dns
 
+components:
+- ../../apps/external-dns
+
 secretGenerator:
 - name: cloudflare-token
   envs:
   - config/cloudflare-token.env
+  options:
+    disableNameSuffixHash: true
 
-helmCharts:
-- name: external-dns
-  releaseName: external-dns
-  version: 1.10.1
-  repo: https://kubernetes-sigs.github.io/external-dns
-  valuesInline:
-    provider: cloudflare
-    logLevel: debug
-    txtOwnerId: k8s
-    extraArgs:
-      # only create records for service/ingress with this annotation
-      - "--annotation-filter=sclem.dev/external-dns"
-    env:
-      - name: CF_API_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: cloudflare-token
-            key: token
+configMapGenerator:
+- name: external-dns-values-env
+  files:
+  - values.yaml

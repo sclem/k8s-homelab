@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: postgresql
+spec:
+  chart:
+    spec:
+      chart: postgresql
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: 11.9.11
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: postgresql-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: postgresql-values-env
+    valuesKey: values.yaml

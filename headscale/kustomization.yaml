@@ -1,47 +1,56 @@
 namespace: headscale
 
+components:
+- ../apps/headscale
+- ../apps/postgresql
+
 configMapGenerator:
 - name: headscale-config
+  behavior: replace
   files:
   - config/config.yaml
 - name: headscale-acl
+  behavior: replace
   files:
   - config/acl.hujson
-- name: headscale-domain
+- name: postgresql-values-env
   files:
-  - config/domain
+  - values.yaml=config/postgres-values.yaml
 
 secretGenerator:
 - name: headscale-private-key
+  behavior: replace
   files:
   - config/key
 - name: headscale-env
+  behavior: replace
   envs:
   - config/headscale.env
 
 resources:
 - ./namespace.yaml
-- ./deployment-headscale.yaml
-- ./service-headscale.yaml
 - ./service-headscale-stun.yaml
-- ./statefulset-db.yaml
-- ./service-db.yaml
-- ./ingress.yaml
+- ./config/ingress.yaml
 
 patchesStrategicMerge:
-- ./patches/headscale-ingress.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: headscale-domain
-    fieldPath: data.domain
-  targets:
-  - select:
-      kind: Ingress
-      name: headscale-ingress
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
-    options:
-      create: true
+- |-
+  kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: headscale
+  spec:
+    template:
+      spec:
+        tolerations:
+          - key: cloud
+            operator: Exists
+            effect: NoExecute
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: cloud
+                  operator: In
+                  values:
+                  - oracle

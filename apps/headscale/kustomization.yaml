@@ -1,0 +1,21 @@
+kind: Component
+
+secretGenerator:
+- name: headscale-private-key
+  literals:
+  - key=
+- name: headscale-env
+  literals:
+  - HEADSCALE_LOG_LEVEL=debug
+
+configMapGenerator:
+- name: headscale-config
+  literals:
+  - config.yaml=
+- name: headscale-acl
+  literals:
+  - acl.hujson=
+
+resources:
+- ./deployment.yaml
+- ./service.yaml

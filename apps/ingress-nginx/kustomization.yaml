@@ -1,0 +1,13 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: ingress-nginx-values-common
+  files:
+  - values.yaml
+
+resources:
+- namespace.yaml
+- helmrelease.yaml

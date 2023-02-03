@@ -1,0 +1,3 @@
+prometheus-node-exporter:
+  tolerations:
+  - operator: Exists

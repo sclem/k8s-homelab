@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cups
+spec:
+  ports:
+  - name: cups
+    port: 631
+    targetPort: 631
+    protocol: TCP
+  selector:
+    app: cups

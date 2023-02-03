@@ -1,0 +1,11 @@
+namespace: flux-system
+
+resources:
+- helmrepository-bitnami.yaml
+- helmrepository-jetstack.yaml
+- helmrepository-ingress-nginx.yaml
+- helmrepository-external-dns.yaml
+- helmrepository-gitlab.yaml
+- helmrepository-nvidia.yaml
+- helmrepository-k8s-at-home.yaml
+- helmrepository-prometheus.yaml

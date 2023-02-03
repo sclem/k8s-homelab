@@ -1,11 +1,11 @@
-namespace: home
+kind: Kustomization
 
 resources:
 - ./adguard
-- ./unifi
-- ./pproxy
-- ./heimdall
-- ./librespeed
-- ./filebrowser
 - ./cameras
 - ./cups
+- ./filebrowser
+- ./heimdall
+- ./keycloak
+- ./tinyproxy
+- ./unifi

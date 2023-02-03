@@ -1,5 +1,0 @@
-namespace: home
-
-resources:
-- ./deployment.yaml
-- ./service.yaml

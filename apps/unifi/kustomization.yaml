@@ -1,0 +1,6 @@
+kind: Component
+
+resources:
+- ./statefulset.yaml
+- ./service.yaml
+- ./pv.yaml

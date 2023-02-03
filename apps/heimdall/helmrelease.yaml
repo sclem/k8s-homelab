@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: heimdall
+spec:
+  chart:
+    spec:
+      chart: heimdall
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+      version: 8.4.2
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: heimdall-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: heimdall-values-env
+    valuesKey: values.yaml

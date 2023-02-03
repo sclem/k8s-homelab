@@ -1,0 +1,16 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+secretGenerator:
+- name: registry-s3
+  literals:
+  - REGISTRY_STORAGE=s3
+- name: registry-keycloak
+  literals:
+  - trust_chain.pem=
+
+resources:
+- deployment.yaml
+- service.yaml

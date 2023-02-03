@@ -1,12 +1,34 @@
 namespace: home
 
+components:
+- ../../apps/cups
+
 secretGenerator:
 - name: regcred
   files:
   - config/.dockerconfigjson
   type: kubernetes.io/dockerconfigjson
 
+patchesStrategicMerge:
+- |-
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: cups
+  spec:
+    loadBalancerIP: 192.168.3.63
+    type: LoadBalancer
+
+- |-
+  kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: cups
+  spec:
+    template:
+      spec:
+        imagePullSecrets:
+        - name: regcred
+
 resources:
-- deployment.yaml
-- service.yaml
-- pvc.yaml
+- pv.yaml

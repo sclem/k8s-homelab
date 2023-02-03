@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: redis
+spec:
+  chart:
+    spec:
+      chart: redis
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: 17.3.6
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: redis-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: redis-values-env
+    valuesKey: values.yaml

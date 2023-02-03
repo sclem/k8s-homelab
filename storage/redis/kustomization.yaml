@@ -1,22 +1,12 @@
-helmCharts:
-- name: redis
-  releaseName: redis
-  version: 17.3.6
-  repo: https://charts.bitnami.com/bitnami
-  valuesInline:
-    fullnameOverride: redis
-    architecture: standalone
-    auth:
-      enabled: false
-    master:
-      persistence:
-        enabled: true
-        storageClass: local-storage
-        accessModes:
-          - ReadWriteOnce
-        size: 8Gi
-    tls:
-      enabled: false
+namespace: storage
 
-resources:
+components:
+- ../../apps/redis
+
+configMapGenerator:
+- name: redis-values-env
+  files:
+  - values.yaml
+
+patchesStrategicMerge:
 - ./pv.yaml

@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+spec:
+  chart:
+    spec:
+      chart: ingress-nginx
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+        namespace: flux-system
+      version: 4.3.0
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: ingress-nginx-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: ingress-nginx-values-env
+    valuesKey: values.yaml

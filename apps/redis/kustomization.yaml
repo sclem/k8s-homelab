@@ -1,0 +1,13 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: redis-values-common
+  files:
+  - values.yaml
+
+resources:
+- helmrelease.yaml
+- pv.yaml

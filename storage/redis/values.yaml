@@ -1,0 +1,8 @@
+fullnameOverride: redis
+master:
+  persistence:
+    enabled: true
+    storageClass: local-storage
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi

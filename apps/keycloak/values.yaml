@@ -1,0 +1,7 @@
+postgresql:
+  enabled: false
+auth:
+  adminUser: admin
+proxy: edge
+service:
+  type: ClusterIP

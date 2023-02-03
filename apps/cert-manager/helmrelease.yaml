@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+spec:
+  chart:
+    spec:
+      chart: cert-manager
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+        namespace: flux-system
+      version: v1.8.1
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: cert-manager-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: cert-manager-values-env
+    valuesKey: values.yaml

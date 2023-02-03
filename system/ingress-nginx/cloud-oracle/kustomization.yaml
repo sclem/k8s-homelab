@@ -1,0 +1,20 @@
+kind: Kustomization
+
+components:
+- ../../../apps/ingress-nginx
+
+namespace: ingress-nginx-cloud-oracle
+
+configMapGenerator:
+- name: ingress-nginx-values-env
+  files:
+  - config/values.yaml
+
+patchesStrategicMerge:
+- |-
+  apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  kind: HelmRelease
+  metadata:
+    name: ingress-nginx
+  spec:
+    releaseName: ingress-nginx-cloud-oracle

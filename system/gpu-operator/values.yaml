@@ -1,0 +1,4 @@
+node-feature-discovery:
+  worker:
+    nodeSelector:
+      sclem.dev/enable-gpu: "true"

@@ -1,11 +1,4 @@
 namespace: monitoring
 
-helmCharts:
-- name: prometheus
-  releaseName: prometheus
-  repo: https://prometheus-community.github.io/helm-charts
-  version: 19.0.2
-  valuesInline:
-    prometheus-node-exporter:
-      tolerations:
-      - operator: Exists
+components:
+- ../../apps/prometheus

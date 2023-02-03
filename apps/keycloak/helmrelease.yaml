@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: keycloak
+spec:
+  chart:
+    spec:
+      chart: keycloak
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: 10.1.6
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: keycloak-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: keycloak-values-env
+    valuesKey: values.yaml

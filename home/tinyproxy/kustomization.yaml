@@ -1,0 +1,35 @@
+namespace: home
+
+components:
+- ../../apps/tinyproxy
+
+patchesStrategicMerge:
+- |-
+  kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: tinyproxy
+  spec:
+    template:
+      spec:
+        tolerations:
+          - key: cloud
+            operator: Exists
+            effect: NoExecute
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: cloud
+                  operator: In
+                  values:
+                  - oracle
+- |-
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: tinyproxy
+  spec:
+    type: LoadBalancer
+    loadBalancerIP: 10.111.111.82

@@ -1,13 +1,5 @@
 namespace: plex
 
-configMapGenerator:
-- name: plex-dns
-  envs:
-  - config/domains.env
-- name: plex-env
-  envs:
-  - config/plex.env
-
 resources:
 - plex
 - radarr
@@ -19,33 +11,3 @@ resources:
 - tautulli
 - transmission
 - storage-claim.yaml
-
-patchesStrategicMerge:
-- ./patches/transmission.yaml
-- ./patches/ingress-plex-wan.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: plex-dns
-    fieldPath: data.PLEX_DNS_SUFFIX
-  targets:
-  - select:
-      kind: Ingress
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
-    options:
-      delimiter: .
-      index: 1
-- source:
-    kind: ConfigMap
-    name: plex-dns
-    fieldPath: data.PLEX_DNS_WAN
-  targets:
-  - select:
-      kind: Ingress
-      name: nginx-cloud-oracle-plex
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0

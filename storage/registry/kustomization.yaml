@@ -1,32 +1,17 @@
 namespace: storage
 
-configMapGenerator:
-- name: registry-domain
-  envs:
-  - config/domain.env
+components:
+- ../../apps/registry
 
 secretGenerator:
 - name: registry-s3
+  behavior: replace
   envs:
   - config/registry.env
 - name: registry-keycloak
+  behavior: replace
   files:
   - config/trust_chain.pem
 
 resources:
-- deployment.yaml
-- service.yaml
-- ingress.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: registry-domain
-    fieldPath: data.DOMAIN
-  targets:
-  - select:
-      kind: Ingress
-      name: registry
-    fieldPaths:
-    - spec.rules.0.host
-    - spec.tls.0.hosts.0
+- config/ingress.yaml

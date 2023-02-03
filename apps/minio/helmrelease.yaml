@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+spec:
+  chart:
+    spec:
+      chart: minio
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: 11.10.11
+  interval: 24h
+  valuesFrom:
+  - kind: ConfigMap
+    name: minio-values-common
+    valuesKey: values.yaml
+  - kind: ConfigMap
+    name: minio-values-env
+    valuesKey: values.yaml

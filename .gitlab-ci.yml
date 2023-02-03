@@ -29,8 +29,8 @@ build-cups:
     - .build-image-template
   variables:
     IMAGE_NAME: cups-brother
-    CONTEXT_DIR: ./home/cups
-    DOCKERFILE: ./home/cups/Dockerfile
+    CONTEXT_DIR: ./containers/cups-brother
+    DOCKERFILE: ./containers/cups-brother/Dockerfile
 
 build-ssh-client:
   extends:

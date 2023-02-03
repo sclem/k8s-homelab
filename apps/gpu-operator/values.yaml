@@ -1,0 +1,6 @@
+operator:
+  upgradeCRD: true
+driver:
+  enabled: false
+toolkit:
+  enabled: false

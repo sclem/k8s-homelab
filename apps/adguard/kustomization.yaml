@@ -1,0 +1,10 @@
+kind: Component
+
+configMapGenerator:
+- name: adguard-config
+  literals:
+  - AdGuardHome.yaml=
+
+resources:
+- deployment.yaml
+- service.yaml

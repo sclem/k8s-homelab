@@ -1,0 +1,12 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: gitlab-runner-values-common
+  files:
+  - values.yaml
+
+resources:
+- helmrelease.yaml

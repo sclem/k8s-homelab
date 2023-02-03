@@ -1,4 +1,7 @@
+namespace: plex
+
+components:
+- ../../apps/overseerr
+
 resources:
-- deployment.yaml
-- service.yaml
-- ingress.yaml
+- config/ingress.yaml

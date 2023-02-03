@@ -1,18 +1,24 @@
 namespace: plex
 
+components:
+- ../../apps/transmission
+
 configMapGenerator:
 - name: transmission-env
+  behavior: replace
   envs:
   - config/transmission.env
 
 secretGenerator:
 - name: vpn-wg-conf
+  behavior: replace
   files:
   - conf=config/wg0.conf
   envs:
   - config/vpn-port.env
 
 resources:
-- deployment.yaml
-- service.yaml
-- ingress.yaml
+- config/ingress.yaml
+
+patchesStrategicMerge:
+- patches/transmission.yaml

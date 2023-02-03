@@ -3,14 +3,6 @@ kind: PersistentVolume
 metadata:
   name: heimdall-config
 spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 1Gi
-  claimRef:
-    kind: PersistentVolumeClaim
-    name: heimdall-config
-    namespace: home
   local:
     path: /data/raid/k8s/home/heimdall/config
   nodeAffinity:
@@ -19,6 +11,3 @@ spec:
       - matchExpressions:
         - key: sclem.dev/storage-host
           operator: Exists
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  volumeMode: Filesystem

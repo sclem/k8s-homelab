@@ -1,0 +1,15 @@
+kind: Component
+
+configMapGenerator:
+- name: mosquitto-config
+  files:
+  - mosquitto.conf
+
+secretGenerator:
+- name: mqtt-auth
+  literals:
+  - passwd.conf=
+
+resources:
+- ./deployment.yaml
+- ./service.yaml
