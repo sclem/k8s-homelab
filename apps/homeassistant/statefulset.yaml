@@ -24,8 +24,6 @@ spec:
           env:
             - name: TZ
               value: "America/New_York"
-            - name: PYWEMO_CALLBACK_ADDRESS
-              value: WEMO_IP:8989
           volumeMounts:
             - mountPath: /config
               name: data

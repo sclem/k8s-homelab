@@ -1,0 +1,22 @@
+namespace: iot
+
+components:
+- ../../apps/zigbee2mqtt
+
+configMapGenerator:
+- name: zigbee2mqtt-values-env
+  behavior: replace
+  files:
+  - config/values.yaml
+
+resources:
+- ./pv.yaml
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: zigbee2mqtt-data
+  spec:
+    volumeName: zigbee2mqtt-data

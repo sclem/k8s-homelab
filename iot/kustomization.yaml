@@ -1,52 +1,8 @@
 namespace: iot
 
-components:
-- ../apps/homeassistant
-- ../apps/mosquitto
-- ../apps/zigbee2mqtt
-
-configMapGenerator:
-- name: hass-urls
-  envs:
-  - config/hass.env
-- name: zigbee2mqtt-values-common
-  files:
-  - values.yaml=zigbee2mqtt-values-common.yaml
-- name: zigbee2mqtt-values-env
-  files:
-  - values.yaml=config/zigbee2mqtt-values-env.yaml
-
-secretGenerator:
-- name: mqtt-auth
-  behavior: replace
-  files:
-  - passwd.conf=config/mosquitto-passwd.conf
-
 resources:
 - ./namespace.yaml
-- ./patches/ingress-hass.yaml
-
-patchesStrategicMerge:
-- ./patches/hass-pv.yaml
-- ./patches/zigbee2mqtt-pv.yaml
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: hass-urls
-    fieldPath: data.WEMO_URL
-  targets:
-  - select:
-      kind: Deployment
-      name: hass
-    fieldPaths:
-    - spec.template.spec.containers.[name=hass].env.[name=PYWEMO_CALLBACK_ADDRESS].value
-    options:
-      delimiter: ":"
-      index: 0
-      create: true
-  - select:
-      kind: Service
-      name: hass-wemo
-    fieldPaths:
-    - spec.loadBalancerIP
+- ./homeassistant
+- ./zigbee2mqtt
+- ./mosquitto
+- ./frigate

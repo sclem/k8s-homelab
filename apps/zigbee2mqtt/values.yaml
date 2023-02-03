@@ -1,0 +1,6 @@
+image:
+  tag: 1.28.4
+persistence:
+  data:
+    enabled: true
+    existingClaim: zigbee2mqtt-data

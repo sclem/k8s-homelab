@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: hass-configurator
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3218
+  selector:
+    app: hass-configurator

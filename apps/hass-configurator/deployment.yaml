@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hass-configurator
+spec:
+  selector:
+    matchLabels:
+      app: hass-configurator
+  template:
+    metadata:
+      labels:
+        app: hass-configurator
+    spec:
+      volumes:
+      - name: hass-config
+        persistentVolumeClaim:
+          claimName: data-hass-0
+      - name: config
+        configMap:
+          name: hass-configurator-settings
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      containers:
+      - name: configurator
+        image: causticlab/hass-configurator-docker:latest
+        ports:
+        - containerPort: 3218
+        envFrom:
+        - configMapRef:
+            name: hass-configurator
+        volumeMounts:
+        - name: hass-config
+          mountPath: /hass-config
+        - name: config
+          mountPath: /config

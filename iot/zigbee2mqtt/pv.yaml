@@ -7,11 +7,14 @@ spec:
   - ReadWriteOnce
   capacity:
     storage: 2Gi
-  claimRef:
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    name: zigbee2mqtt-data
-    namespace: iot
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   volumeMode: Filesystem
+  local:
+    path: /data/raid/k8s/home/zigbee2mqtt
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: sclem.dev/storage-host
+          operator: Exists

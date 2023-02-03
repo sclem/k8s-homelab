@@ -1,0 +1,14 @@
+kind: Component
+
+components:
+- ../../components/configurations
+
+configMapGenerator:
+- name: frigate
+  literals:
+  - config.yml=
+
+resources:
+- deployment.yaml
+- service.yaml
+- pvc.yaml

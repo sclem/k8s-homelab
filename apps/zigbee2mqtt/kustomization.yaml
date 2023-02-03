@@ -3,6 +3,14 @@ kind: Component
 components:
 - ../../components/configurations
 
+configMapGenerator:
+- name: zigbee2mqtt-values-common
+  files:
+  - values.yaml
+- name: zigbee2mqtt-values-env
+  literals:
+  - values.yaml=
+
 resources:
 - helmrelease.yaml
-- pv.yaml
+- pvc.yaml

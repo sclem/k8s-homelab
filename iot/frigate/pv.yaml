@@ -1,0 +1,19 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: frigate
+spec:
+  capacity:
+    storage: 2Ti
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/raid/k8s/home/frigate
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: sclem.dev/storage-host
+          operator: Exists

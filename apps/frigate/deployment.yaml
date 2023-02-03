@@ -1,0 +1,75 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: frigate
+  labels:
+    app: frigate
+spec:
+  selector:
+    matchLabels:
+      app: frigate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      runtimeClassName: nvidia
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: frigate
+        name: config
+      - name: media
+        persistentVolumeClaim:
+          claimName: frigate-pvc
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+        name: dshm
+      containers:
+      - env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: all
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: all
+        - name: TZ
+          value: America/New_York
+        image: blakeblackshear/frigate:0.11.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: frigate
+        ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+        - containerPort: 1935
+          name: rtmp
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 10
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /media/frigate
+          name: media
+        - mountPath: /dev/shm
+          name: dshm

@@ -1,0 +1,10 @@
+namespace: iot
+
+components:
+- ../../apps/mosquitto
+
+secretGenerator:
+- name: mqtt-auth
+  behavior: replace
+  files:
+  - passwd.conf=config/mosquitto-passwd.conf

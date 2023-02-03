@@ -9,3 +9,4 @@ resources:
 - helmrepository-nvidia.yaml
 - helmrepository-k8s-at-home.yaml
 - helmrepository-prometheus.yaml
+- helmrepository-frigate.yaml

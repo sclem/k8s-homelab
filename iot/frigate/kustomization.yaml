@@ -1,0 +1,14 @@
+namespace: iot
+
+components:
+- ../../apps/frigate
+
+configMapGenerator:
+- name: frigate
+  behavior: replace
+  files:
+  - config.yml=config/config.yaml
+
+resources:
+- config/ingress.yaml
+- pv.yaml

@@ -1,0 +1,13 @@
+kind: Component
+
+configMapGenerator:
+- name: hass-configurator
+  literals:
+  - HASS_HOST=
+- name: hass-configurator-settings
+  files:
+  - settings.conf
+
+resources:
+- deployment.yaml
+- service.yaml
