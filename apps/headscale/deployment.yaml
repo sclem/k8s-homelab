@@ -32,7 +32,7 @@ spec:
         ports:
         - containerPort: 8080
         - containerPort: 3478
-        image: docker.io/headscale/headscale:0.16.4
+        image: docker.io/headscale/headscale:0.20.0
         envFrom:
           - secretRef:
               name: headscale-env
@@ -56,6 +56,9 @@ spec:
         - name: private-key
           mountPath: /var/run/headscale/private.key
           subPath: key
+        - name: private-key
+          mountPath: /var/run/headscale/noise_private.key
+          subPath: noise-key
         - name: acl
           mountPath: /var/run/headscale/acl.hujson
           subPath: acl.hujson

@@ -22,6 +22,7 @@ secretGenerator:
   behavior: replace
   files:
   - config/key
+  - noise-key=config/noise.key
 - name: headscale-env
   behavior: replace
   envs:
