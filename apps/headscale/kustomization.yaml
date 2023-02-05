@@ -14,7 +14,7 @@ configMapGenerator:
   - config.yaml=
 - name: headscale-acl
   literals:
-  - acl.hujson=
+  - acl.yaml=
 
 resources:
 - ./deployment.yaml

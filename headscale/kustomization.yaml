@@ -12,7 +12,7 @@ configMapGenerator:
 - name: headscale-acl
   behavior: replace
   files:
-  - config/acl.hujson
+  - config/acl.yaml
 - name: postgresql-values-env
   files:
   - values.yaml=config/postgres-values.yaml
