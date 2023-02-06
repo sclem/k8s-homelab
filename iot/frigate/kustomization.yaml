@@ -3,6 +3,12 @@ namespace: iot
 components:
 - ../../apps/frigate
 
+secretGenerator:
+- name: basic-auth-frigate
+  files:
+  - config/auth
+  type: Opaque
+
 configMapGenerator:
 - name: frigate
   behavior: replace
