@@ -1,0 +1,22 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: derp
+spec:
+  selector:
+    matchLabels:
+      app: derp
+  template:
+    metadata:
+      labels:
+        app: derp
+    spec:
+      containers:
+      - name: derp
+        image: docker.io/fredliang/derper:5786d266e20adef99a74eeaca2c525af2a334d88
+        ports:
+        - containerPort: 443
+        - containerPort: 3478
+        envFrom:
+          - configMapRef:
+              name: derp-config

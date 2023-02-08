@@ -6,7 +6,7 @@ resource "oci_core_network_security_group" "lb" {
 }
 
 module "nlb_security_rule" {
-  source   = "./modules/oci_nlb_security_rule"
+  source   = "./modules/oci_security_rule"
   for_each = local.lb_mapping
 
   network_security_group_id = oci_core_network_security_group.lb.id

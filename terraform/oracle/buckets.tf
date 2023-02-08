@@ -15,4 +15,3 @@ resource "oci_objectstorage_bucket" "this" {
 
   freeform_tags = local.tags
 }
-

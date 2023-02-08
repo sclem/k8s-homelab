@@ -5,53 +5,34 @@ resource "oci_core_network_security_group" "instance" {
   freeform_tags  = local.tags
 }
 
-resource "oci_core_network_security_group_security_rule" "instance-ipv6-ingress-udp-wg51820" {
-  for_each                  = local.everywhere_cidrs
-  network_security_group_id = oci_core_network_security_group.instance.id
-  direction                 = "INGRESS"
-  protocol                  = "17" # udp
-  source                    = each.value
-  source_type               = "CIDR_BLOCK"
-  stateless                 = false
-
-  udp_options {
-    destination_port_range {
-      min = 51820
-      max = 51821
+locals {
+  exposed_instance_ports = {
+    wg51820 = {
+      port     = 51820
+      protocol = "UDP"
+    }
+    wg41820 = {
+      port     = 41820
+      protocol = "UDP"
+    }
+    stun = {
+      port     = 30478
+      protocol = "UDP"
+    }
+    relay = {
+      port     = 30883
+      protocol = "TCP"
     }
   }
+  instance_ports = var.enable_ssh ? merge({ ssh = { port = 22, protocol = "TCP" } }, local.exposed_instance_ports) : local.exposed_instance_ports
 }
 
-resource "oci_core_network_security_group_security_rule" "instance-ingress-udp-wg41820" {
-  for_each                  = local.everywhere_cidrs
+module "instance_security_rule" {
+  source   = "./modules/oci_security_rule"
+  for_each = local.instance_ports
+
   network_security_group_id = oci_core_network_security_group.instance.id
-  direction                 = "INGRESS"
-  protocol                  = "17" # udp
-  source                    = each.value
-  source_type               = "CIDR_BLOCK"
-  stateless                 = false
-
-  udp_options {
-    destination_port_range {
-      min = 41820
-      max = 41820
-    }
-  }
-}
-
-resource "oci_core_network_security_group_security_rule" "instance-ipv4-ingress-tcp-ssh" {
-  for_each                  = toset([for cidr in local.everywhere_cidrs : cidr if var.enable_ssh])
-  network_security_group_id = oci_core_network_security_group.instance.id
-  direction                 = "INGRESS"
-  protocol                  = "6" # tcp
-  source                    = each.value
-  source_type               = "CIDR_BLOCK"
-  stateless                 = false
-
-  tcp_options {
-    destination_port_range {
-      min = 22
-      max = 22
-    }
-  }
+  tcp                       = each.value.protocol == "TCP"
+  cidrs                     = local.everywhere_cidrs
+  port                      = each.value.port
 }

@@ -4,6 +4,7 @@ secretGenerator:
 - name: headscale-private-key
   literals:
   - key=
+  - noise-key=
 - name: headscale-env
   literals:
   - HEADSCALE_LOG_LEVEL=debug
@@ -12,9 +13,10 @@ configMapGenerator:
 - name: headscale-config
   literals:
   - config.yaml=
-- name: headscale-acl
-  literals:
   - acl.yaml=
+  - derpmap.yaml=
+- name: headscale-env
+  literals: []
 
 resources:
 - ./deployment.yaml

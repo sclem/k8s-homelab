@@ -3,25 +3,28 @@ namespace: headscale
 components:
 - ../apps/headscale
 - ../apps/postgresql
+- ../apps/derp
 
 configMapGenerator:
 - name: headscale-config
   behavior: replace
   files:
   - config/config.yaml
-- name: headscale-acl
-  behavior: replace
-  files:
   - config/acl.yaml
+  - config/derpmap.yaml
 - name: postgresql-values-env
   files:
   - values.yaml=config/postgres-values.yaml
+- name: derp-config
+  behavior: merge
+  envs:
+  - config/derp.env
 
 secretGenerator:
 - name: headscale-private-key
   behavior: replace
   files:
-  - config/key
+  - key=config/key
   - noise-key=config/noise.key
 - name: headscale-env
   behavior: replace
@@ -30,8 +33,9 @@ secretGenerator:
 
 resources:
 - ./namespace.yaml
-- ./service-headscale-stun.yaml
 - ./config/ingress.yaml
+- ./config/derp-cert.yaml
+- ./config/derp-service.yaml
 
 patchesStrategicMerge:
 - |-
@@ -55,3 +59,4 @@ patchesStrategicMerge:
                   operator: In
                   values:
                   - oracle
+- ./patches/deployment-derp.yaml
