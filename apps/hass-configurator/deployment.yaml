@@ -24,7 +24,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: configurator
-        image: causticlab/hass-configurator-docker:latest
+        image: causticlab/hass-configurator-docker:0.5.2
         ports:
         - containerPort: 3218
         envFrom:

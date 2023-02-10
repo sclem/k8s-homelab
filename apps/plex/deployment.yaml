@@ -22,7 +22,7 @@ spec:
             claimName: plex-pvc
       containers:
         - name: plex
-          image: ghcr.io/k8s-at-home/plex
+          image: ghcr.io/onedr0p/plex:1.30.2.6563-3d4dc0cce
           volumeMounts:
             - mountPath: /config
               name: data

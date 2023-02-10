@@ -41,7 +41,7 @@ spec:
           ports:
             - containerPort: 53
             - containerPort: 80
-          image: docker.io/adguard/adguardhome
+          image: docker.io/adguard/adguardhome:v0.107.23
           volumeMounts:
             - mountPath: /opt/adguardhome/work
               name: work

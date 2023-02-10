@@ -25,7 +25,7 @@ spec:
         - name: sonarr
           ports:
             - containerPort: 8989
-          image: ghcr.io/k8s-at-home/sonarr
+          image: ghcr.io/onedr0p/sonarr:3.0.9.1549
           volumeMounts:
             - mountPath: /config
               name: data

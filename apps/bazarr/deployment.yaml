@@ -25,7 +25,7 @@ spec:
         - name: bazarr
           ports:
             - containerPort: 6767
-          image: ghcr.io/k8s-at-home/bazarr
+          image: ghcr.io/onedr0p/bazarr:1.1.4
           volumeMounts:
             - mountPath: /config
               name: data

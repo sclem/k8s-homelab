@@ -25,7 +25,7 @@ spec:
         - name: overseerr
           ports:
             - containerPort: 5055
-          image: docker.io/sctx/overseerr
+          image: docker.io/sctx/overseerr:1.32.5
           volumeMounts:
             - mountPath: /app/config
               name: data

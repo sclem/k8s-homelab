@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: cups
-        image: registry.sclem.dev/cups-brother
+        image: registry.sclem.dev/cups-brother:sha-1b752cbd
         ports:
         - containerPort: 631
         volumeMounts:

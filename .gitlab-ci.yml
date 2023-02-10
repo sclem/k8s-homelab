@@ -8,6 +8,10 @@ stages:
     entrypoint: [""]
   script:
     - |
+      DESTINATION="--destination $HOMELAB_REGISTRY/$IMAGE_NAME:sha-$CI_COMMIT_SHORT_SHA"
+      if [[ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]]; then
+        DESTINATION="$DESTINATION --destination $HOMELAB_REGISTRY/$IMAGE_NAME:latest"
+      fi
       mkdir -p /kaniko/.docker && \
         echo '{
           "auths": {
@@ -22,7 +26,7 @@ stages:
       --context $CONTEXT_DIR \
       --dockerfile $DOCKERFILE \
       --cache=true \
-      --destination $HOMELAB_REGISTRY/$IMAGE_NAME
+      $DESTINATION
 
 build-cups:
   extends:
@@ -31,6 +35,9 @@ build-cups:
     IMAGE_NAME: cups-brother
     CONTEXT_DIR: ./containers/cups-brother
     DOCKERFILE: ./containers/cups-brother/Dockerfile
+  rules:
+    - changes:
+        - containers/cups-brother/**/*
 
 build-ssh-client:
   extends:
@@ -39,3 +46,6 @@ build-ssh-client:
     IMAGE_NAME: ssh-client
     CONTEXT_DIR: ./containers/ssh-client
     DOCKERFILE: ./containers/ssh-client/Dockerfile
+  rules:
+    - changes:
+        - containers/ssh-client/**/*

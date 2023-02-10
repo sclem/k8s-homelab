@@ -5,7 +5,7 @@ components:
 
 configMapGenerator:
 - name: transmission-env
-  behavior: replace
+  behavior: merge
   envs:
   - config/transmission.env
 
