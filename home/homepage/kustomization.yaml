@@ -1,0 +1,19 @@
+namespace: home
+
+components:
+- ../../apps/homepage
+
+configMapGenerator:
+- name: homepage
+  behavior: merge
+  files:
+  - config/bookmarks.yaml
+  - config/services.yaml
+  - config/widgets.yaml
+  - config/settings.yaml
+
+patches:
+- config/deploy-patch-volumes.yaml
+
+resources:
+- config/ingress.yaml

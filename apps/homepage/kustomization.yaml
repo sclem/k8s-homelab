@@ -1,0 +1,17 @@
+kind: Component
+
+configMapGenerator:
+- name: homepage
+  literals:
+  - settings.yaml=
+  - bookmarks.yaml=
+  - services.yaml=
+  - widgets.yaml=
+  - docker.yaml=
+  files:
+  - kubernetes.yaml
+
+resources:
+- rbac.yaml
+- deployment.yaml
+- service.yaml
