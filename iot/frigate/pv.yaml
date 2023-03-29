@@ -10,7 +10,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /data/raid/k8s/home/frigate
+    path: /data/video/frigate
   nodeAffinity:
     required:
       nodeSelectorTerms:
