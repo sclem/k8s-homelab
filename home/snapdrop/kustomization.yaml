@@ -1,0 +1,12 @@
+kind: Kustomization
+
+namespace: home
+
+components:
+- ../../apps/snapdrop
+
+resources:
+- config/ingress.yaml
+
+patches:
+- config/patch.yaml

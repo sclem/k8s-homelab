@@ -1,0 +1,25 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: snapdrop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snapdrop
+  template:
+    metadata:
+      labels:
+        app: snapdrop
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: oci-cloud-arm
+      tolerations:
+      - key: cloud
+        operator: Exists
+        effect: NoExecute
+      containers:
+      - name: snapdrop
+        image: linuxserver/snapdrop
+        ports:
+        - containerPort: 80
