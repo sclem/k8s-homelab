@@ -8,6 +8,10 @@ secretGenerator:
   files:
   - config/auth
   type: Opaque
+- name: regcred
+  files:
+  - config/.dockerconfigjson
+  type: kubernetes.io/dockerconfigjson
 
 configMapGenerator:
 - name: frigate
@@ -18,3 +22,4 @@ configMapGenerator:
 resources:
 - config/ingress.yaml
 - pv.yaml
+- config/custom-clip.yaml
