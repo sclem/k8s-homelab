@@ -1,0 +1,29 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: tensorrt-models
+  namespace: iot
+spec:
+  template:
+    spec:
+      runtimeClassName: nvidia
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: models-builder
+        env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: all
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: all
+        image: registry.sclem.dev/tensorrt-models
+        volumeMounts:
+        - name: frigate
+          mountPath: /tensorrt_models
+          subPath: tensorrt_models
+      restartPolicy: Never
+      volumes:
+      - name: frigate
+        persistentVolumeClaim:
+          claimName: frigate-pvc
+  backoffLimit: 4

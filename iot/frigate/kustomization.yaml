@@ -12,6 +12,8 @@ secretGenerator:
   files:
   - config/.dockerconfigjson
   type: kubernetes.io/dockerconfigjson
+  options:
+    disableNameSuffixHash: true
 
 configMapGenerator:
 - name: frigate

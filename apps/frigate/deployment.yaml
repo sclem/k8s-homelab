@@ -36,7 +36,7 @@ spec:
           value: all
         - name: TZ
           value: America/New_York
-        image: blakeblackshear/frigate:0.11.0
+        image: ghcr.io/blakeblackshear/frigate:0.12.0-tensorrt
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5
@@ -71,5 +71,8 @@ spec:
           name: config
         - mountPath: /media/frigate
           name: media
+        - mountPath: /trt-models
+          name: media
+          subPath: tensorrt_models
         - mountPath: /dev/shm
           name: dshm
